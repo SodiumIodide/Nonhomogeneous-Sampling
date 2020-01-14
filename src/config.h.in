@@ -1,0 +1,91 @@
+#ifndef _CONFIG_H
+#define _CONFIG_H
+
+#cmakedefine LINEAR
+#cmakedefine QUADRATIC
+#cmakedefine PIECEWISE
+#cmakedefine REJECTION
+#cmakedefine S2
+#cmakedefine PUREABS
+#cmakedefine GEOMETRYTIME
+#cmakedefine ANALYTICAL
+#cmakedefine VOLFRAC
+
+#ifndef _CONSTANTS_H
+#include "constants.h"
+#endif
+
+// Use preprocessor macros to keep logic within configuration file
+// Variables referenced exist in main file
+
+#ifdef PIECEWISE
+    #ifdef QUADRATIC
+        #ifdef REJECTION
+            #include "piecewise_constant_quad_geometry_gen_rejection.h"
+            #define GEOMETRY_GEN() do {\
+                success = get_geometry_piecewise_constant_quad_rejection(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+            } while (0)
+            #define OPEN_FILE() do {\
+                fp = fopen("../csv/flux_piecewise_quad_thinning.csv", "w");\
+            } while (0)
+        #else
+            #include "piecewise_constant_quad_geometry_gen.h"
+            #define GEOMETRY_GEN() do {\
+                success = get_geometry_piecewise_constant_quad(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+            } while (0)
+            #define OPEN_FILE() do {\
+                fp = fopen("../csv/flux_piecewise_quad.csv", "w");\
+            } while (0)
+        #endif
+    #endif
+    #ifdef LINEAR
+        #ifdef REJECTION
+            #include "piecewise_constant_geometry_gen_rejection.h"
+            #define GEOMETRY_GEN() do {\
+                success = get_geometry_piecewise_constant_rejection(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+            } while (0)
+            #define OPEN_FILE() do {\
+                fp = fopen("../csv/flux_piecewise_linear_thinning.csv", "w");\
+            } while (0)
+        #else
+            #include "piecewise_constant_geometry_gen.h"
+            #define GEOMETRY_GEN() do {\
+                success = get_geometry_piecewise_constant(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+            } while (0)
+            #define OPEN_FILE() do {\
+                fp = fopen("../csv/flux_piecewise_linear.csv", "w");\
+            } while (0)
+        #endif
+    #endif
+#else
+    #ifdef QUADRATIC
+        #include "quad_geometry_gen_rejection.h"
+        #define GEOMETRY_GEN() do {\
+            success = get_geometry_quad_rejection(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+        } while (0)
+        #define OPEN_FILE() do {\
+            fp = fopen("../csv/flux_quad_thinning.csv", "w");\
+        } while (0)
+    #endif
+    #ifdef LINEAR
+        #ifdef REJECTION
+            #include "linear_geometry_gen_rejection.h"
+            #define GEOMETRY_GEN() do {\
+                success = get_geometry_linear_rejection(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+            } while (0)
+            #define OPEN_FILE() do {\
+                fp = fopen("../csv/flux_linear_thinning.csv", "w");\
+            } while (0)
+        #else
+            #include "linear_geometry_gen.h"
+            #define GEOMETRY_GEN() do {\
+                success = get_geometry_linear(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+            } while (0)
+            #define OPEN_FILE() do {\
+                fp = fopen("../csv/flux_linear.csv", "w");\
+            } while (0)
+        #endif
+    #endif
+#endif
+
+#endif

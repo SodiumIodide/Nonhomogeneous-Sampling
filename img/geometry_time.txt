@@ -1,0 +1,27 @@
+Linear:
+Clock cycles for 100000 iterations of generation: 242917562
+Approximate cycles per function call: 2430
+
+Linear Thinning:
+Clock cycles for 100000 iterations of generation: 263268280
+Approximate cycles per function call: 2633
+
+Piecewise Linear:
+Clock cycles for 100000 iterations of generation: 222643510464
+Approximate cycles per function call: 2226436
+
+Piecewise Linear Thinning:
+Clock cycles for 100000 iterations of generation: 282526398
+Approximate cycles per function call: 2826
+
+Quadratic Thinning:
+Clock cycles for 100000 iterations of generation: 240075491
+Approximate cycles per function call: 2401
+
+Piecewise Quadratic:
+Clock cycles for 100000 iterations of generation: 312261563735
+Approximate cycles per function call: 3122616
+
+Piecewise Quadratic Thinning:
+Clock cycles for 100000 iterations of generation: 238475814
+Approximate cycles per function call: 2385
