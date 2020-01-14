@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-rm -rf ./build/*
+if [ -d ./build/ ]
+then
+    rm -rf ./build/*
+else
+    mkdir build
+fi
 cd ./build/
 cmake ../src
 make

@@ -5,7 +5,7 @@ use strict;
 
 sub main() {
     opendir my $dh, '.' or die "Cannot open local directory\n";
-    my @files = grep { /.+\.ultra$/ and -f "./$_"} readdir $dh;
+    my @files = grep { /.+\.ultra$/ and -f "./$_" } readdir $dh;
     foreach my $file (@files) {
         $file =~ /(.+)\.ultra/;
         my $filename = $1;
@@ -16,7 +16,7 @@ sub main() {
         while (my $line = <$fh>) {
             if ($line =~ /#/) {
                 $iterator++;
-                open $output_fh, '>', "$filename" . "_" . "$iterator.csv" or die "Cannot create $filename.csv\n";
+                open $output_fh, '>', "$filename" . "_" . "$iterator.csv" or die "Cannot create $filename csv\n";
                 $line =~ s/#//;
                 $line =~ s/psi/phi/;
             }
