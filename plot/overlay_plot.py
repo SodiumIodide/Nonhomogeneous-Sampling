@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 '''
+For LP problems
+
 Problem Sets -> Scattering Ratio 0, Scattering Ratio 1:
 0 -> 0.0, 0.0
 1 -> 0.9, 0.9
@@ -27,11 +29,11 @@ class lp_data:
         self.r_flux_1 = r_data['flux1']
     def plot(self, plotname, filename):
         # Plot flux
-        plt.plot(self.distance, self.flux_0, ls=':', lw='4', color='r', label="LP Material 0")
-        plt.plot(self.distance, self.flux_1, ls=':', lw='4', color='b', label="LP Material 1")
-        plt.plot(self.r_distance, self.r_flux_0, color='r', label="Material 0")
-        plt.plot(self.r_distance, self.r_flux_1, color='b', label="Material 1")
-        plt.title(plotname)
+        plt.plot(self.distance, self.flux_0, color='r', label="LP Material 0")
+        plt.plot(self.distance, self.flux_1, color='b', label="LP Material 1")
+        plt.plot(self.r_distance, self.r_flux_0, ls=':', lw='4', color='r', label="Material 0")
+        plt.plot(self.r_distance, self.r_flux_1, ls=':', lw='4', color='b', label="Material 1")
+        #plt.title(plotname)
         plt.xlabel("Distance")
         plt.ylabel("Flux")
         plt.xscale(XSCALE)

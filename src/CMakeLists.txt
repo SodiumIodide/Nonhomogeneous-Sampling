@@ -10,13 +10,13 @@ project(NonHomog)
 ######## USER SELECTED VARIABLES ########
 #########################################
 # Type of sampling method (default is direct)
-option(REJECTION "Sample via thinning" ON)
+option(REJECTION "Sample via thinning" OFF)
 
 # Calculation type (default is linear)
-option(QUADRATIC "Quadratic Model" OFF)
+option(QUADRATIC "Quadratic Model" ON)
 
 # Function type (default is continuous)
-option(PIECEWISE "Piecewise Constant Model" OFF)
+option(PIECEWISE "Piecewise Constant Model" ON)
 
 # Solution type (ONLY CHOOSE ONE) (geometry timing is prioritized - default is pure absorber solution)
 option(S2 "Numerical Two-Ordinate SN Transport Method" OFF)

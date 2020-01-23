@@ -10,3 +10,4 @@ cd ./build/
 cmake ../src
 make
 ./NonHomog
+echo -e "\007"

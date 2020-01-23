@@ -73,16 +73,20 @@ int get_geometry_piecewise_constant_quad(double start_value_0, double end_value_
         accepted = 0;
         // Start at current segment
         current_segment = (int)(cons_dist / delta_dist);
-        segment = current_segment + 1;
+        segment = current_segment;
         while (!accepted) {
-            first_portion = ((current_segment + 1) * delta_dist - cons_dist) / piecewise_constant_quad_chord(param_a, param_b, param_c, num_segments, end_dist, cons_dist);
-            middle_portion = 0.0;
-            for (int k = current_segment + 1; k < segment; k++) {
-                middle_portion += delta_dist / piecewise_constant_quad_chord(param_a, param_b, param_c, num_segments, end_dist, ((double)k + 0.5) * delta_dist);
+            if (segment > current_segment) {
+                first_portion = ((current_segment + 1) * delta_dist - cons_dist) / piecewise_constant_quad_chord(param_a, param_b, param_c, num_segments, end_dist, cons_dist);
+                middle_portion = 0.0;
+                for (int k = current_segment + 1; k < segment; k++) {
+                    middle_portion += delta_dist / piecewise_constant_quad_chord(param_a, param_b, param_c, num_segments, end_dist, ((double)k + 0.5) * delta_dist);
+                }
+                dist = segment * delta_dist - piecewise_constant_quad_chord(param_a, param_b, param_c, num_segments, end_dist, ((double)(segment) + 0.5) * delta_dist) * (log(rand_num) + middle_portion + first_portion) - cons_dist;
+            } else {
+                dist = -log(rand_num) * piecewise_constant_quad_chord(param_a, param_b, param_c, num_segments, end_dist, cons_dist);
             }
-            dist = segment * delta_dist - piecewise_constant_quad_chord(param_a, param_b, param_c, num_segments, end_dist, ((double)(segment) + 0.5) * delta_dist) * (log(rand_num) + middle_portion + first_portion) - cons_dist;
             if (dist > (end_dist - cons_dist)) dist = end_dist - cons_dist;
-            if (dist > (segment + 1) * delta_dist) {
+            if ((dist + cons_dist > (segment + 1) * delta_dist) || (dist + cons_dist < segment * delta_dist)) {
                 segment++;
             } else {
                 accepted = 1;
