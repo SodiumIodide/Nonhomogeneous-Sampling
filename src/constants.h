@@ -28,8 +28,8 @@ const double SIGMA_T[2] = {
 };  // cm^-1
 // Scattering coefficient
 const double SCAT_COEFF[2] = {
-    0.9,
-    0.9
+    0.0,
+    1.0
 };
 // Spontaneous volumetric source constant
 const double SPONT_SOURCE_CONST[2] = {
