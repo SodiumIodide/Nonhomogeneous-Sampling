@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 from plot import XSCALE, YSCALE, DATAPATH, PLOTPATH
 
 LPPATH = f"{DATAPATH}/LPData"
+ALLPATH = f"{DATAPATH}/AllData"
 
 class lp_data:
     def __init__(self, in_data_0, in_data_1, r_data):
@@ -27,6 +28,7 @@ class lp_data:
         self.r_distance = r_data['distance']
         self.r_flux_0 = r_data['flux0']
         self.r_flux_1 = r_data['flux1']
+
     def plot(self, plotname, filename):
         # Plot flux
         plt.plot(self.distance, self.flux_0, color='r', label="LP Material 0")
@@ -51,7 +53,7 @@ def main():
     try:
         data_0 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob0_MCLOrder1_1.csv")
         data_1 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob0_MCLOrder1_2.csv")
-        data_r = pd.read_csv(f"{LPPATH}/flux_linear_thinning_0.csv")
+        data_r = pd.read_csv(f"{ALLPATH}/flux_linear_thinning_0.csv")
         obj = lp_data(data_0, data_1, data_r)
         obj.plot("Flux Comparison", "lp_linear_0")
     except:
@@ -60,7 +62,7 @@ def main():
     try:
         data_0 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob1_MCLOrder1_1.csv")
         data_1 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob1_MCLOrder1_2.csv")
-        data_r = pd.read_csv(f"{LPPATH}/flux_linear_thinning_1.csv")
+        data_r = pd.read_csv(f"{ALLPATH}/flux_linear_thinning_1.csv")
         obj = lp_data(data_0, data_1, data_r)
         obj.plot("Flux Comparison", "lp_linear_1")
     except:
@@ -69,7 +71,7 @@ def main():
     try:
         data_0 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob2_MCLOrder1_1.csv")
         data_1 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob2_MCLOrder1_2.csv")
-        data_r = pd.read_csv(f"{LPPATH}/flux_linear_thinning_2.csv")
+        data_r = pd.read_csv(f"{ALLPATH}/flux_linear_thinning_2.csv")
         obj = lp_data(data_0, data_1, data_r)
         obj.plot("Flux Comparison", "lp_linear_2")
     except:
@@ -78,7 +80,7 @@ def main():
     try:
         data_0 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob3_MCLOrder1_1.csv")
         data_1 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob3_MCLOrder1_2.csv")
-        data_r = pd.read_csv(f"{LPPATH}/flux_linear_thinning_3.csv")
+        data_r = pd.read_csv(f"{ALLPATH}/flux_linear_thinning_3.csv")
         obj = lp_data(data_0, data_1, data_r)
         obj.plot("Flux Comparison", "lp_linear_3")
     except:
@@ -87,7 +89,7 @@ def main():
     try:
         data_0 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob0_MCLOrder2_1.csv")
         data_1 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob0_MCLOrder2_2.csv")
-        data_r = pd.read_csv(f"{LPPATH}/flux_quad_thinning_0.csv")
+        data_r = pd.read_csv(f"{ALLPATH}/flux_quad_thinning_0.csv")
         obj = lp_data(data_0, data_1, data_r)
         obj.plot("Flux Comparison", "lp_quad_0")
     except:
@@ -96,7 +98,7 @@ def main():
     try:
         data_0 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob1_MCLOrder2_1.csv")
         data_1 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob1_MCLOrder2_2.csv")
-        data_r = pd.read_csv(f"{LPPATH}/flux_quad_thinning_1.csv")
+        data_r = pd.read_csv(f"{ALLPATH}/flux_quad_thinning_1.csv")
         obj = lp_data(data_0, data_1, data_r)
         obj.plot("Flux Comparison", "lp_quad_1")
     except:
@@ -105,7 +107,7 @@ def main():
     try:
         data_0 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob2_MCLOrder2_1.csv")
         data_1 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob2_MCLOrder2_2.csv")
-        data_r = pd.read_csv(f"{LPPATH}/flux_quad_thinning_2.csv")
+        data_r = pd.read_csv(f"{ALLPATH}/flux_quad_thinning_2.csv")
         obj = lp_data(data_0, data_1, data_r)
         obj.plot("Flux Comparison", "lp_quad_2")
     except:
@@ -114,7 +116,7 @@ def main():
     try:
         data_0 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob3_MCLOrder2_1.csv")
         data_1 = pd.read_csv(f"{LPPATH}/LPModelRod_Prob3_MCLOrder2_2.csv")
-        data_r = pd.read_csv(f"{LPPATH}/flux_quad_thinning_3.csv")
+        data_r = pd.read_csv(f"{ALLPATH}/flux_quad_thinning_3.csv")
         obj = lp_data(data_0, data_1, data_r)
         obj.plot("Flux Comparison", "lp_quad_3")
     except:
