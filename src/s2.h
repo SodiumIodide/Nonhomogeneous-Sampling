@@ -2,7 +2,8 @@
 #define _S2_H
 
 #include <stdio.h>
-#include <stdlib.h>
+
+#include <gsl/gsl_rng.h>
 
 #ifndef _LEGENDRE_GAUSS_H
 #include "legendre_gauss.h"
@@ -36,6 +37,7 @@
     free(weights);\
     free(psi_bound_l);\
     free(psi_bound_r);\
+    gsl_rng_free(rng);\
 } while (0)
 
 #define CLEANUP_LOOP() do{\
@@ -69,8 +71,9 @@ double max_relative_error(double *arr_a, double *arr_b) {
 }
 
 void s2() {
-    // Seed built-in generator
-    srand(SEED);
+    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
+    // Seed generator
+    gsl_rng_set(rng, SEED);
     // Iterators
     long int c, m;
     long int num_iter_inner = (long int)1e5;

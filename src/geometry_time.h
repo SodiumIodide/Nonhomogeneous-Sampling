@@ -6,6 +6,8 @@
 #include <time.h>
 #include <stdint.h>
 
+#include <gsl/gsl_rng.h>
+
 #ifndef _CONSTANTS_H
 #include "constants.h"
 #endif
@@ -18,6 +20,7 @@
     free(x_delta);\
     free(x_arr);\
     free(materials);\
+    gsl_rng_free(rng);\
 } while (0)
 
 static inline unsigned long rdtsc() {
@@ -39,6 +42,9 @@ static inline unsigned long rdtsc() {
 }
 
 void geometry_time() {
+    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
+    // Seed generator
+    gsl_rng_set(rng, SEED);
     // Initially allocate to 1-length
     double *x_delta = malloc(sizeof *x_delta * NUM_DIVS);
     double *x_arr = malloc(sizeof *x_arr * NUM_DIVS);

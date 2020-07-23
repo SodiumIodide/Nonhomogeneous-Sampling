@@ -1,6 +1,8 @@
 #ifndef _RUNNING_STATISTICS_H
 #define _RUNNING_STATISTICS_H
 
+#include <math.h>
+
 typedef struct runningstat {
     long m_n;
     double m_oldM;
@@ -30,26 +32,28 @@ void clear(runningstat *r) {
 }
 
 void push(runningstat *r, double x) {
-    r->m_n += 1;
+    if (!isnan(x)) {
+        r->m_n += 1;
 
-    // See Knuth TAOCP vol 2, 3rd edition, page 232
-    if (r->m_n == 1) {
-        r->m_oldM = r->m_newM = x;
-        r->m_oldS = 0.0;
-        r->m_min = r->m_max = x;
-    } else {
-        r->m_newM = r->m_oldM + (x - r->m_oldM) / r->m_n;
-        r->m_newS = r->m_oldS + (x - r->m_oldM) * (x - r->m_newM);
+        // See Knuth TAOCP vol 2, 3rd edition, page 232
+        if (r->m_n == 1) {
+            r->m_oldM = r->m_newM = x;
+            r->m_oldS = 0.0;
+            r->m_min = r->m_max = x;
+        } else {
+            r->m_newM = r->m_oldM + (x - r->m_oldM) / r->m_n;
+            r->m_newS = r->m_oldS + (x - r->m_oldM) * (x - r->m_newM);
 
-        // Set up for next iteration
-        r->m_oldM = r->m_newM;
-        r->m_oldS = r->m_newS;
+            // Set up for next iteration
+            r->m_oldM = r->m_newM;
+            r->m_oldS = r->m_newS;
 
-        // Min and max
-        if (x < r->m_min) {
-            r->m_min = x;
-        } else if (x > r->m_max) {
-            r->m_max = x;
+            // Min and max
+            if (x < r->m_min) {
+                r->m_min = x;
+            } else if (x > r->m_max) {
+                r->m_max = x;
+            }
         }
     }
 }

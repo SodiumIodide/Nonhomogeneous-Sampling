@@ -17,7 +17,7 @@ void material_calc(double** unstructured, double **unstruct_delta, int** materia
         double unstruct_distance_tally = 0.0;  // cm
         double struct_distance_tally = 0.0;  // cm
         double leftover_distance = 0.0;  // cm
-        double m_switch = 0.0;  // cm
+        double m_switch = 0.0;
         double delta = 0.0;  // cm
 
         // Loop for mapping the unstructured to the structured mesh

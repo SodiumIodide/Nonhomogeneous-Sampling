@@ -2,12 +2,13 @@
 #define _PIECEWISE_CONSTANT_GEOMETRY_GEN_REJECTION_H
 
 #include <math.h>
-#include <stdlib.h>
+
+#include <gsl/gsl_rng.h>
 
 #include "piecewise_constant_chord.h"
 
 // Returns boolean value for success
-int get_geometry_piecewise_constant_rejection(double start_value_0, double end_value_0, double start_value_1, double end_value_1, int num_segments, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
+int get_geometry_piecewise_constant_rejection(const gsl_rng* rng, double start_value_0, double end_value_0, double start_value_1, double end_value_1, int num_segments, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
     // Computational values
     int material_num;
     double rand_num;
@@ -34,7 +35,7 @@ int get_geometry_piecewise_constant_rejection(double start_value_0, double end_v
     double first_value_0 = piecewise_constant_chord(start_value_0, end_value_0, num_segments, end_dist, 0.0);
     double first_value_1 = piecewise_constant_chord(start_value_1, end_value_1, num_segments, end_dist, 0.0);
     const double prob_0 = first_value_0 / (first_value_0 + first_value_1);
-    material_num = ((rand() / (double)RAND_MAX) < prob_0) ? 0 : 1;
+    material_num = (gsl_rng_uniform_pos(rng) < prob_0) ? 0 : 1;
 
     // The value that the chord possesses for the maximum value computed (for rejection purposes)
     // As exponential distribution is computed using the inverse of the chord-length, the minimum value is chosen
@@ -60,7 +61,7 @@ int get_geometry_piecewise_constant_rejection(double start_value_0, double end_v
         int accepted = 0;
         while (!accepted) {
             // Generate a random number
-            rand_num = rand() / (double)RAND_MAX;
+            rand_num = gsl_rng_uniform_pos(rng);
 
             // Sample from a homogeneous distribution of intensity equal to maximum chord
             dist -= limiting_value_chord * log(rand_num);
@@ -71,7 +72,7 @@ int get_geometry_piecewise_constant_rejection(double start_value_0, double end_v
             buffer_chord = piecewise_constant_chord(chord_start, chord_end, num_segments, end_dist, cons_dist + dist);
             prob_accept = limiting_value_chord / buffer_chord;
 
-            rand_num = rand() / (double)RAND_MAX;
+            rand_num = gsl_rng_uniform_pos(rng);
             if (rand_num < prob_accept) accepted = 1;
         }
 
@@ -99,6 +100,9 @@ int get_geometry_piecewise_constant_rejection(double start_value_0, double end_v
                 *x_delta = buf_x_delta;
                 *x_arr = buf_x_arr;
                 *materials = buf_materials;
+                buf_x_delta = NULL;
+                buf_x_arr = NULL;
+                buf_materials = NULL;
             }
 
             // The width of each cell

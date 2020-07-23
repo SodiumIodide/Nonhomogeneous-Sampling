@@ -8,6 +8,8 @@ Methods of nonhomogeneous Poisson sampling for generic neutral particle transpor
     - As a build tool, but with some configuration file editing this can be avoided.
 - **LAPACK**
     - For the analytical solution to the system. The code currently assumes a column-major array accessing scheme utilized by this library.
+- **GSL**
+    - Required for the random number generator. The built-in C random number generator contained in `stdlib.h` proved to be too coarse, and the cycle was not long enough for extended runs.
 
 ### Python and Visualization
 
@@ -45,6 +47,15 @@ Available solution types (only one may be used at a time). These will override t
 - **VOLFRAC**
     - The solution files generated will not contain material-average scalar fluxes, but will contain material volume fraction values. This is largely the same statistical computation, but scalar flux solutions are assumed unity and zero-value terms are included in averaging.
 
+Additional parameters:
+- **COX_UNIFORM**
+    - Selecting this will override other options set. The chord length model will use a doubly-stochastic Cox model, sampled from a Uniform distribution, before sampling the Markovian material sublayers.
+- **COX_EXPONENTIAL**
+    - Same as above, but chord lengths are sampled from an Exponential distribution, before sampling the Markovian material sublayers.
+- **COX_GAUSSIAN**
+    - Same as above, but chord lengths are sampled from a Gaussian or Normal distribution, before sampling the Markovian material sublayers.
+- **CONSTANT**
+    - Overrides other options. This setting will use constant chord lengths to generate the geometry, equal to the starting chord lengths of each material. That is, the end chord lengths are not used.
 
 ### constants.h
 
@@ -56,6 +67,9 @@ Other useful parameters to change are included in this file. Comments are presen
 | `NUM_ORDS` | Number of ordinates in an SN solution. Default and tested value is 2 |
 | `START_VALUE` | Array containing the chord length values at the left-hand problem boundary, defined as the x-axis origin |
 | `END_VALUE` | Array containing the chord length values at the right-hand problem boundary |
+| `COX_START_VALUE` | Array containing the lower bounds of the Cox distribution, used in the computation of of the distribution mean |
+| `COX_END_VALUE` | Array containing the upper bounds of the Cox distribution, used in the computation of the distribution mean |
+| `GAUSSIAN_VARIANCE` | For the Gaussian or Normal Cox process, this is an array containing the variance used when sampling values |
 | `END_DIST` | The x-axis location of the right-hand problem boundary, or the total x-length of the problem |
 | `SIGMA_T` | Array containing the total macroscopic cross-section values of each material |
 | `SCAT_COEFF` | Array containing the scattering ratio values of each material: defined as the scattering cross-section divided by the total cross-section |
@@ -66,6 +80,7 @@ Other useful parameters to change are included in this file. Comments are presen
 | `FLUX_INIT` | Pure absorber solution only - scalar flux boundary condition at the left-hand side of the problem, exponentially attenuated through material regions |
 | `NUM_TIME` | Geometry timing solution only - number of geometries to generate when tallying CPU cycles consumed |
 | `NUM_REALIZATIONS` | Total number of realizations to create while averaging scalar flux data |
+| `NUM_TIME` | Total number of realizations to create when performing the geometry time calculation, which is considerably faster than a transport solution |
 | `NUM_SAY` | When running in terminal, a progress message is displayed for every `NUM_SAY` completed realizations |
 | `TOLERANCE` | The relative error tolerance for convergence testing when using diamond differencing in the SN solution |
 

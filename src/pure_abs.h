@@ -2,7 +2,8 @@
 #define _PURE_ABS_H
 
 #include <stdio.h>
-#include <stdlib.h>
+
+#include <gsl/gsl_rng.h>
 
 #ifndef _RUNNING_STATISTICS_H
 #include "running_statistics.h"
@@ -29,11 +30,13 @@
     free(s_flux_1);\
     free(m_flux_0);\
     free(m_flux_1);\
+    gsl_rng_free(rng);\
 } while (0)
 
 void pure_abs() {
-    // Seed built-in generator
-    srand(SEED);
+    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
+    // Seed generator
+    gsl_rng_set(rng, SEED);
     // Material absorption cross-sections
     double sigma_a[2] = {
         (1.0 - SCAT_COEFF[0]) * SIGMA_T[0],

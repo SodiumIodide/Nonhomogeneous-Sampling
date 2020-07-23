@@ -2,12 +2,13 @@
 #define _PIECEWISE_CONSTANT_GEOMETRY_GEN_H
 
 #include <math.h>
-#include <stdlib.h>
+
+#include <gsl/gsl_rng.h>
 
 #include "piecewise_constant_chord.h"
 
 // Returns boolean value for success
-int get_geometry_piecewise_constant(double start_value_0, double end_value_0, double start_value_1, double end_value_1, int num_segments, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
+int get_geometry_piecewise_constant(const gsl_rng* rng, double start_value_0, double end_value_0, double start_value_1, double end_value_1, int num_segments, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
     // Computational values
     int material_num;
     double rand_num;
@@ -35,14 +36,14 @@ int get_geometry_piecewise_constant(double start_value_0, double end_value_0, do
     double first_value_0 = piecewise_constant_chord(start_value_0, end_value_0, num_segments, end_dist, 0.0);
     double first_value_1 = piecewise_constant_chord(start_value_1, end_value_1, num_segments, end_dist, 0.0);
     const double prob_0 = first_value_0 / (first_value_0 + first_value_1);
-    material_num = ((rand() / (double)RAND_MAX) < prob_0) ? 0 : 1;
+    material_num = (gsl_rng_uniform_pos(rng) < prob_0) ? 0 : 1;
 
     // Delta distance in piecewise function (required to obtain chords at each segment)
     double delta_dist = end_dist / (double)num_segments;
 
     while (cons_dist < end_dist) {
         // Generate a random number
-        rand_num = rand() / (double)RAND_MAX;
+        rand_num = gsl_rng_uniform_pos(rng);
 
         // Assign a chord length based on material number
         if (material_num == 0) {
@@ -64,7 +65,7 @@ int get_geometry_piecewise_constant(double start_value_0, double end_value_0, do
                 first_portion = ((current_segment + 1) * delta_dist - cons_dist) / piecewise_constant_chord(chord_start, chord_end, num_segments, end_dist, cons_dist);
                 middle_portion = 0.0;
                 for (int k = current_segment + 1; k < segment; k++) {
-                middle_portion += delta_dist / piecewise_constant_chord(chord_start, chord_end, num_segments, end_dist, ((double)k + 0.5) * delta_dist);
+                    middle_portion += delta_dist / piecewise_constant_chord(chord_start, chord_end, num_segments, end_dist, ((double)k + 0.5) * delta_dist);
                 }
                 dist = segment * delta_dist - piecewise_constant_chord(chord_start, chord_end, num_segments, end_dist, ((double)(segment) + 0.5) * delta_dist) * (log(rand_num) + middle_portion + first_portion) - cons_dist;
             } else {
@@ -78,7 +79,7 @@ int get_geometry_piecewise_constant(double start_value_0, double end_value_0, do
                 if (dist < 0.0) {
                     accepted = 0;
                     dist = 0.0;
-                    rand_num = rand() / (double)RAND_MAX;
+                    rand_num = gsl_rng_uniform_pos(rng);
                 }
             }
         }
@@ -107,6 +108,9 @@ int get_geometry_piecewise_constant(double start_value_0, double end_value_0, do
                 *x_delta = buf_x_delta;
                 *x_arr = buf_x_arr;
                 *materials = buf_materials;
+                buf_x_delta = NULL;
+                buf_x_arr = NULL;
+                buf_materials = NULL;
             }
 
             // The width of each cell

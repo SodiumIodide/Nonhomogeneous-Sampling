@@ -2,11 +2,12 @@
 #define _PIECEWISE_CONSTANT_QUAD_GEOMETRY_GEN_H
 
 #include <math.h>
-#include <stdlib.h>
+
+#include <gsl/gsl_rng.h>
 
 #include "piecewise_constant_quad_chord.h"
 
-int get_geometry_piecewise_constant_quad(double start_value_0, double end_value_0, double start_value_1, double end_value_1, int num_segments, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
+int get_geometry_piecewise_constant_quad(const gsl_rng* rng, double start_value_0, double end_value_0, double start_value_1, double end_value_1, int num_segments, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
     // Computational values
     int material_num;
     double rand_num;
@@ -48,14 +49,14 @@ int get_geometry_piecewise_constant_quad(double start_value_0, double end_value_
     double first_value_0 = piecewise_constant_quad_chord(param_a_0, param_b_0, param_c_0, num_segments, end_dist, 0.0);
     double first_value_1 = piecewise_constant_quad_chord(param_a_1, param_b_1, param_c_1, num_segments, end_dist, 0.0);
     const double prob_0 = first_value_0 / (first_value_0 + first_value_1);
-    material_num = ((rand() / (double)RAND_MAX) < prob_0) ? 0 : 1;
+    material_num = (gsl_rng_uniform_pos(rng) < prob_0) ? 0 : 1;
 
     // Delta distance in piecewise function (required to obtain chords at each segment)
     double delta_dist = end_dist / (double)num_segments;
 
     while (cons_dist < end_dist) {
         // Generate a random number
-        rand_num = rand() / (double)RAND_MAX;
+        rand_num = gsl_rng_uniform_pos(rng);
 
         // Assign a chord length based on material number
         if (material_num == 0) {
@@ -68,7 +69,7 @@ int get_geometry_piecewise_constant_quad(double start_value_0, double end_value_
             param_c = param_c_1;
         }
 
-        // Loop for sampling distance (required to test eaach segment of piecewise function)
+        // Loop for sampling distance (required to test each segment of piecewise function)
         // Note that segments are zero-indexed
         accepted = 0;
         // Start at current segment
@@ -93,7 +94,7 @@ int get_geometry_piecewise_constant_quad(double start_value_0, double end_value_
                 if (dist < 0.0) {
                     accepted = 0;
                     dist = 0.0;
-                    rand_num = rand() / (double)RAND_MAX;
+                    rand_num = gsl_rng_uniform_pos(rng);
                 }
             }
         }
@@ -122,6 +123,9 @@ int get_geometry_piecewise_constant_quad(double start_value_0, double end_value_
                 *x_delta = buf_x_delta;
                 *x_arr = buf_x_arr;
                 *materials = buf_materials;
+                buf_x_delta = NULL;
+                buf_x_arr = NULL;
+                buf_materials = NULL;
             }
 
             // The width of each cell

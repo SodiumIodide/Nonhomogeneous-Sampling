@@ -2,9 +2,9 @@
 #define _ANALYTICAL_H
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
-#include <cblas.h>
+
+#include <gsl/gsl_rng.h>
 
 #ifndef _RUNNING_STATISTICS_H
 #include "running_statistics.h"
@@ -35,6 +35,7 @@
     free(phi_mat_stat_0);\
     free(phi_mat_stat_1);\
     free(cell_vector);\
+    gsl_rng_free(rng);\
 } while (0)
 
 #define CLEANUP_LOOP() do{\
@@ -44,12 +45,13 @@
     free(pivot);\
 } while (0)
 
-int dgesv_(int *n, int *nrhs, double *a,
+void dgesv_(int *n, int *nrhs, double *a,
            int *lda, int *ipiv, double *b, int *ldb, int *info);
 
 void analytical() {
-    // Seed built-in generator
-    srand(SEED);
+    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
+    // Seed generator
+    gsl_rng_set(rng, SEED);
     // Iterators
     long int c, i;
     // Material absorption cross-sections
@@ -201,53 +203,61 @@ void analytical() {
 
         if (info != 0) {
             // Write an error message
-            printf("dgesv returned error %d\n", info);
-        }
-
-        iterations_outer++;
-
-        // Assign values of flux from calculation of integration constants
-        c = 0;
-        for (i = 0; i < num_r_cells; i++) {
-            if ((i % NUM_DIVS == 0) && (i != 0)) c += 2;
-            if (sigma_a[*(materials + i)] != 0.0) {
-                *(phi_morph + i) = *(alpha_beta_vec + c) * exp((*(x_arr + i) + *(x_delta + i) / 2.0) / length_scale[*(materials + i)]) + *(alpha_beta_vec + c + 1) * exp(-(*(x_arr + i) + *(x_delta + i) / 2.0) / length_scale[*(materials + i)]);
-            } else {
-                *(phi_morph + i) = *(alpha_beta_vec + c) * (*(x_arr + i) + *(x_delta + i) / 2.0) + *(alpha_beta_vec + c + 1);
+            printf("On iteration number %ld\n", iterations_outer);
+            if (info > 0) {
+                printf("Factor U(%d, %d) is exactly zero\n", info, info);
+            } else if (info < 0) {
+                printf("The %d-th argument had an illegal value\n", -info);
             }
-        }
+            printf("Will not use data, continuing calculation\n");
+        } else {
+            iterations_outer++;
 
-        // Obtain material balances
-        // Average flux in structured cells
-        material_calc(&phi_morph, &x_delta, &materials, &num_r_cells, delta_x, NUM_CELLS, &phi_mat_0, &phi_mat_1);
-
-        for (c = 0; c < NUM_CELLS; c++) {
-            if (*(phi_mat_0 + c) != 0.0) {
-                push(&*(phi_mat_stat_0 + c), *(phi_mat_0 + c));
-            }
-            if (*(phi_mat_1 + c) != 0.0) {
-                push(&*(phi_mat_stat_1 + c), *(phi_mat_1 + c));
-            }
-        }  // Cell loop
-
-        if (iterations_outer % NUM_SAY == 0) {
-            printf("\rRealization Number: %ld / %ld", iterations_outer, NUM_REALIZATIONS);
-            fflush(stdout);
-        }
-
-        // Produce a one-realization profile
-        if (iterations_outer == 1) {
-            fp = fopen("../csv/one_realization.csv", "w");
-            fprintf(fp, "distance,flux\n");
+            // Assign values of flux from calculation of integration constants
+            c = 0;
             for (i = 0; i < num_r_cells; i++) {
-                distance += *(x_delta + i);
-                fprintf(fp, "%f,%f\n", distance - *(x_delta + i) / 2.0, *(phi_morph + i));
+                if ((i % NUM_DIVS == 0) && (i != 0)) c += 2;
+                if (sigma_a[*(materials + i)] != 0.0) {
+                    *(phi_morph + i) = *(alpha_beta_vec + c) * exp((*(x_arr + i) + *(x_delta + i) / 2.0) / length_scale[*(materials + i)]) + *(alpha_beta_vec + c + 1) * exp(-(*(x_arr + i) + *(x_delta + i) / 2.0) / length_scale[*(materials + i)]);
+                } else {
+                    *(phi_morph + i) = *(alpha_beta_vec + c) * (*(x_arr + i) + *(x_delta + i) / 2.0) + *(alpha_beta_vec + c + 1);
+                }
             }
-            fclose(fp);
-            printf("First realization data written\n");
+
+            // Obtain material balances
+            // Average flux in structured cells
+            material_calc(&phi_morph, &x_delta, &materials, &num_r_cells, delta_x, NUM_CELLS, &phi_mat_0, &phi_mat_1);
+
+            for (c = 0; c < NUM_CELLS; c++) {
+                if (*(phi_mat_0 + c) != 0.0) {
+                    push(&*(phi_mat_stat_0 + c), *(phi_mat_0 + c));
+                }
+                if (*(phi_mat_1 + c) != 0.0) {
+                    push(&*(phi_mat_stat_1 + c), *(phi_mat_1 + c));
+                }
+            }  // Cell loop
+
+            if (iterations_outer % NUM_SAY == 0) {
+                printf("\rRealization Number: %ld / %ld", iterations_outer, NUM_REALIZATIONS);
+                fflush(stdout);
+            }
+
+            // Produce a one-realization profile
+            if (iterations_outer == 1) {
+                fp = fopen("../csv/one_realization.csv", "w");
+                fprintf(fp, "distance,flux\n");
+                for (i = 0; i < num_r_cells; i++) {
+                    distance += *(x_delta + i);
+                    fprintf(fp, "%f,%f\n", distance - *(x_delta + i) / 2.0, *(phi_morph + i));
+                }
+                fclose(fp);
+                printf("First realization data written\n");
+            }
         }
 
-        if (iterations_outer > NUM_REALIZATIONS) cont_calc_outer = 0;
+        if (iterations_outer > NUM_REALIZATIONS) {
+            cont_calc_outer = 0;
+        }
 
         // Cleanup
         CLEANUP_LOOP();

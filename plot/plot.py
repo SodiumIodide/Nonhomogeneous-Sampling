@@ -58,7 +58,7 @@ def main():
         ylabel = "Volume Fraction"
     else:
         ylabel = "Flux"
-    r_exists = l_exists = q_r_exists = pw_exists = pw_r_exists = pw_q_exists = pw_q_r_exists = True
+    r_exists = l_exists = q_r_exists = pw_exists = pw_r_exists = pw_q_exists = pw_q_r_exists = c_u_exists = c_e_exists = c_g_exists = con_exists = True
     try:
         r_data = pd.read_csv(f"{DATAPATH}/flux_linear_thinning.csv")
     except FileNotFoundError:
@@ -94,6 +94,26 @@ def main():
     except FileNotFoundError:
         print("Piecewise quadratic thinning not found")
         pw_q_r_exists = False
+    try:
+        c_u_data = pd.read_csv(f"{DATAPATH}/flux_cox_uniform.csv")
+    except FileNotFoundError:
+        print("Uniform Cox not found")
+        c_u_exists = False
+    try:
+        c_e_data = pd.read_csv(f"{DATAPATH}/flux_cox_exponential.csv")
+    except FileNotFoundError:
+        print("Exponential Cox not found")
+        c_e_exists = False
+    try:
+        c_g_data = pd.read_csv(f"{DATAPATH}/flux_cox_gaussian.csv")
+    except FileNotFoundError:
+        print("Gaussian Cox not found")
+        c_g_exists = False
+    try:
+        con_data = pd.read_csv(f"{DATAPATH}/flux_constant.csv")
+    except FileNotFoundError:
+        print("Constant not found")
+        con_exists = False
     if r_exists:
         r_obj = data(r_data, ylabel)
         if flux:
@@ -136,6 +156,30 @@ def main():
             pw_q_r_obj.plot("Quadratic Piecewise Constant Thinning Flux", "flux_piecewise_quad_thinning")
         else:
             pw_q_r_obj.plot("Quadratic Piecewise Constant Thinning Volume Fraction", "vf_piecewise_quad_thinning")
+    if c_u_exists:
+        c_u_obj = data(c_u_data, ylabel)
+        if flux:
+            c_u_obj.plot("Uniform Cox Flux", "cox_uniform")
+        else:
+            c_u_obj.plot("Uniform Cox Volume Fraction", "vf_cox_uniform")
+    if c_e_exists:
+        c_e_obj = data(c_e_data, ylabel)
+        if flux:
+            c_e_obj.plot("Exponential Cox Flux", "cox_exponential")
+        else:
+            c_e_obj.plot("Exponential Cox Volume Fraction", "vf_cox_exponential")
+    if c_g_exists:
+        c_g_obj = data(c_g_data, ylabel)
+        if flux:
+            c_g_obj.plot("Gaussian Cox Flux", "cox_gaussian")
+        else:
+            c_g_obj.plot("Gaussian Cox Volume Fraction", "vf_cox_gaussian")
+    if con_exists:
+        con_obj = data(con_data, ylabel)
+        if flux:
+            con_obj.plot("Constant Flux", "constant")
+        else:
+            con_obj.plot("Constat Volume Fraction", "vf_constant")
 
 if __name__ == '__main__':
     main()

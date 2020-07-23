@@ -10,6 +10,10 @@
 #cmakedefine GEOMETRYTIME
 #cmakedefine ANALYTICAL
 #cmakedefine VOLFRAC
+#cmakedefine COX_UNIFORM
+#cmakedefine COX_EXPONENTIAL
+#cmakedefine COX_GAUSSIAN
+#cmakedefine CONSTANT
 
 #ifndef _CONSTANTS_H
 #include "constants.h"
@@ -18,12 +22,20 @@
 // Use preprocessor macros to keep logic within configuration file
 // Variables referenced exist in main file
 
-#ifdef PIECEWISE
+#ifdef CONSTANT
+    #include "geometry_gen.h"
+    #define GEOMETRY_GEN() do {\
+        success = get_geometry(rng, START_VALUE[0], START_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+    } while (0)
+    #define OPEN_FILE() do {\
+        fp = fopen("../csv/flux_constant.csv", "w");\
+    } while (0)
+#elif defined PIECEWISE
     #ifdef QUADRATIC
         #ifdef REJECTION
             #include "piecewise_constant_quad_geometry_gen_rejection.h"
             #define GEOMETRY_GEN() do {\
-                success = get_geometry_piecewise_constant_quad_rejection(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                success = get_geometry_piecewise_constant_quad_rejection(rng, START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
             } while (0)
             #define OPEN_FILE() do {\
                 fp = fopen("../csv/flux_piecewise_quad_thinning.csv", "w");\
@@ -31,7 +43,7 @@
         #else
             #include "piecewise_constant_quad_geometry_gen.h"
             #define GEOMETRY_GEN() do {\
-                success = get_geometry_piecewise_constant_quad(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                success = get_geometry_piecewise_constant_quad(rng, START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
             } while (0)
             #define OPEN_FILE() do {\
                 fp = fopen("../csv/flux_piecewise_quad.csv", "w");\
@@ -42,7 +54,7 @@
         #ifdef REJECTION
             #include "piecewise_constant_geometry_gen_rejection.h"
             #define GEOMETRY_GEN() do {\
-                success = get_geometry_piecewise_constant_rejection(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                success = get_geometry_piecewise_constant_rejection(rng, START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
             } while (0)
             #define OPEN_FILE() do {\
                 fp = fopen("../csv/flux_piecewise_linear_thinning.csv", "w");\
@@ -50,7 +62,7 @@
         #else
             #include "piecewise_constant_geometry_gen.h"
             #define GEOMETRY_GEN() do {\
-                success = get_geometry_piecewise_constant(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                success = get_geometry_piecewise_constant(rng, START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], NUM_SEGMENTS, END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
             } while (0)
             #define OPEN_FILE() do {\
                 fp = fopen("../csv/flux_piecewise_linear.csv", "w");\
@@ -61,7 +73,7 @@
     #ifdef QUADRATIC
         #include "quad_geometry_gen_rejection.h"
         #define GEOMETRY_GEN() do {\
-            success = get_geometry_quad_rejection(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+            success = get_geometry_quad_rejection(rng, START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
         } while (0)
         #define OPEN_FILE() do {\
             fp = fopen("../csv/flux_quad_thinning.csv", "w");\
@@ -71,19 +83,45 @@
         #ifdef REJECTION
             #include "linear_geometry_gen_rejection.h"
             #define GEOMETRY_GEN() do {\
-                success = get_geometry_linear_rejection(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                success = get_geometry_linear_rejection(rng, START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
             } while (0)
             #define OPEN_FILE() do {\
                 fp = fopen("../csv/flux_linear_thinning.csv", "w");\
             } while (0)
         #else
-            #include "linear_geometry_gen.h"
-            #define GEOMETRY_GEN() do {\
-                success = get_geometry_linear(START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
-            } while (0)
-            #define OPEN_FILE() do {\
-                fp = fopen("../csv/flux_linear.csv", "w");\
-            } while (0)
+            #ifdef COX_UNIFORM
+                #include "uniform_cox_geometry_gen.h"
+                #define GEOMETRY_GEN() do {\
+                    success = get_geometry_cox_uniform(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                } while (0)
+                #define OPEN_FILE() do {\
+                    fp = fopen("../csv/flux_cox_uniform.csv", "w");\
+                } while (0)
+            #elif defined COX_EXPONENTIAL
+                #include "exponential_cox_geometry_gen.h"
+                #define GEOMETRY_GEN() do {\
+                    success = get_geometry_cox_exponential(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                } while (0)
+                #define OPEN_FILE() do {\
+                    fp = fopen("../csv/flux_cox_exponential.csv", "w");\
+                } while (0)
+            #elif defined COX_GAUSSIAN
+                #include "gaussian_cox_geometry_gen.h"
+                #define GEOMETRY_GEN() do {\
+                    success = get_geometry_cox_gaussian(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], GAUSSIAN_VARIANCE[0], GAUSSIAN_VARIANCE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                } while (0)
+                #define OPEN_FILE() do {\
+                    fp = fopen("../csv/flux_cox_gaussian.csv", "w");\
+                } while (0)
+            #else
+                #include "linear_geometry_gen.h"
+                #define GEOMETRY_GEN() do {\
+                    success = get_geometry_linear(rng, START_VALUE[0], END_VALUE[0], START_VALUE[1], END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                } while (0)
+                #define OPEN_FILE() do {\
+                    fp = fopen("../csv/flux_linear.csv", "w");\
+                } while (0)
+            #endif
         #endif
     #endif
 #endif

@@ -2,7 +2,8 @@
 #define _VOLUME_FRACTION_H
 
 #include <stdio.h>
-#include <stdlib.h>
+
+#include <gsl/gsl_rng.h>
 
 #ifndef _RUNNING_STATISTICS_H
 #include "running_statistics.h"
@@ -29,11 +30,13 @@
     free(s_vfrac_1);\
     free(m_vfrac_0);\
     free(m_vfrac_1);\
+    gsl_rng_free(rng);\
 } while (0)
 
 void volume_fraction() {
-    // Seed built-in generator
-    srand(SEED);
+    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
+    // Seed generator
+    gsl_rng_set(rng, SEED);
     // Iterators
     long int i, c;
     // Geometry variables
@@ -81,6 +84,7 @@ void volume_fraction() {
             exit(EXIT_FAILURE);
         }
         unity = buf_unity;
+        buf_unity = NULL;
 
         // Initialize unity
         for (c = 0; c < num_r_cells; c++) {

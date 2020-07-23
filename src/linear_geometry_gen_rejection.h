@@ -2,12 +2,13 @@
 #define _LINEAR_GEOMETRY_GEN_REJECTION_H
 
 #include <math.h>
-#include <stdlib.h>
+
+#include <gsl/gsl_rng.h>
 
 #include "linear_chord.h"
 
 // Returns boolean value for success
-int get_geometry_linear_rejection(double start_value_0, double end_value_0, double start_value_1, double end_value_1, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
+int get_geometry_linear_rejection(const gsl_rng* rng, double start_value_0, double end_value_0, double start_value_1, double end_value_1, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
     // Computational values
     int material_num;
     double rand_num;
@@ -36,7 +37,7 @@ int get_geometry_linear_rejection(double start_value_0, double end_value_0, doub
     // Determine first material to use
     // For linear model, initial distance is at 0.0 and so the probability is equivalent to the constant term ratio
     const double prob_0 = start_value_0 / (start_value_0 + start_value_1);
-    material_num = ((rand() / (double)RAND_MAX) < prob_0) ? 0 : 1;
+    material_num = (gsl_rng_uniform_pos(rng) < prob_0) ? 0 : 1;
 
     // The value that the chord possesses for the maximum value computed (for rejection purposes)
     // As exponential distribution is computed using the inverse of the chord-length, the minimum value is chosen
@@ -70,7 +71,7 @@ int get_geometry_linear_rejection(double start_value_0, double end_value_0, doub
         int accepted = 0;
         while (!accepted) {
             // Generate a random number
-            rand_num = rand() / (double)RAND_MAX;
+            rand_num = gsl_rng_uniform_pos(rng);
 
             // Sample from a homogeneous distribution of intensity equal to maximum chord
             dist -= limiting_value_chord * log(rand_num);
@@ -81,7 +82,7 @@ int get_geometry_linear_rejection(double start_value_0, double end_value_0, doub
             buffer_chord = linear_chord(chord_start, chord_slope, cons_dist + dist);
             prob_accept = limiting_value_chord / buffer_chord;
 
-            rand_num = rand() / (double)RAND_MAX;
+            rand_num = gsl_rng_uniform_pos(rng);
             if (rand_num < prob_accept) accepted = 1;
         }
 
@@ -109,6 +110,9 @@ int get_geometry_linear_rejection(double start_value_0, double end_value_0, doub
                 *x_delta = buf_x_delta;
                 *x_arr = buf_x_arr;
                 *materials = buf_materials;
+                buf_x_delta = NULL;
+                buf_x_arr = NULL;
+                buf_materials = NULL;
             }
 
             // The width of each cell

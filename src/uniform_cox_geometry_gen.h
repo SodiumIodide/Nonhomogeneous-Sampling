@@ -1,19 +1,17 @@
-#ifndef _GEOMETRY_GEN_H
-#define _GEOMETRY_GEN_H
+#ifndef _UNIFORM_COX_GEOMETRY_GEN_H
+#define _UNIFORM_COX_GEOMETRY_GEN_H
 
 #include <math.h>
 
 #include <gsl/gsl_rng.h>
 
-// Using C standard pseudo random number generator
-// This may be replaced with any pseudo-rng as desired
-
-// Returns boolean value for success
-int get_geometry(const gsl_rng* rng, double chord_0, double chord_1, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
+int get_geometry_cox_uniform(const gsl_rng* rng, double start_value_0, double end_value_0, double start_value_1, double end_value_1, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
     // Computational values
     int material_num;
     double rand_num;
     double chord;
+    double start_value;
+    double delta;
 
     // Buffer pointers for realloc
     double *buf_x_delta = NULL;
@@ -29,15 +27,39 @@ int get_geometry(const gsl_rng* rng, double chord_0, double chord_1, double end_
     *num_cells = 0;
 
     // Determine first material to use
-    const double prob_0 = chord_0 / (chord_0 + chord_1);
+    double delta_0 = end_value_0 - start_value_0;
+    double delta_1 = end_value_1 - start_value_1;
+    rand_num = gsl_rng_uniform_pos(rng);
+    double init_chord_0 = start_value_0 + rand_num * delta_0;
+    rand_num = gsl_rng_uniform_pos(rng);
+    double init_chord_1 = start_value_1 + rand_num * delta_1;
+    double prob_0 = init_chord_0 / (init_chord_0 + init_chord_1);
     material_num = (gsl_rng_uniform_pos(rng) < prob_0) ? 0 : 1;
 
-    while (cons_dist < end_dist) {
-        // Generate a random number
-        rand_num = gsl_rng_uniform_pos(rng);
+    int first_run = 1;
 
-        // Assign a chord length based on material number
-        chord = (material_num == 0) ? chord_0 : chord_1;  // cm
+    while (cons_dist < end_dist) {
+        if (!first_run) {
+            // Generate a random number
+            rand_num = gsl_rng_uniform_pos(rng);
+
+            if (material_num == 0) {
+                start_value = start_value_0;
+                delta = delta_0;
+            } else {
+                start_value = start_value_1;
+                delta = delta_1;
+            }
+
+            chord = start_value + rand_num * delta;
+        } else {
+            // Preserve initial sampling statistics
+            first_run = 0;
+            chord = (material_num == 0) ? init_chord_0 : init_chord_1;
+        }
+
+        // Generate a new random number
+        rand_num = gsl_rng_uniform_pos(rng);
 
         // Calculate and append the material length
         dist = -chord * log(rand_num);  // cm
