@@ -203,7 +203,7 @@ void s2() {
             }
         }
 
-        // Flag to tell whether to use the inner lopo data in averaging or not
+        // Flag to tell whether to use the inner loop data in averaging or not
         int converged = 0;
 
         while (cont_calc_inner) {

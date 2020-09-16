@@ -19,15 +19,15 @@ const double END_VALUE[2] = {
     11.0 / 10.0,
 };  // cm
 const double COX_START_VALUE[2] = {
-    81.0 / 20.0,
-    81.0 / 20.0,
+    1.0 / 10.0,
+    1.0 / 10.0,
 };
 const double COX_END_VALUE[2] = {
-    121.0 / 20.0,
-    121.0 / 20.0,
+    197.0 / 10.0,
+    21.0 / 10.0,
 };
 const double GAUSSIAN_VARIANCE[2] = {
-    0.1,
+    1.0,
     0.1,
 };
 // Distances
@@ -40,8 +40,8 @@ const double SIGMA_T[2] = {
 };  // cm^-1
 // Scattering coefficient
 const double SCAT_COEFF[2] = {
-    0.9,
-    0.9,
+    0.0,
+    0.0,
 };
 // Spontaneous volumetric source constant
 const double SPONT_SOURCE_CONST[2] = {
@@ -66,7 +66,7 @@ const double FLUX_INIT = 1.0;
 const long int NUM_TIME = 1e5L;
 #endif
 // Number of realizations
-const long int NUM_REALIZATIONS = (long int)1e6L;
+const long int NUM_REALIZATIONS = (long int)1e7L;
 // Number of realizations (geometry timing)
 const long int NUM_TIME = (long int)1e7L;
 // Number to display progress

@@ -135,6 +135,10 @@ int get_geometry_linear_rejection(const gsl_rng* rng, double start_value_0, doub
         material_num = (material_num == 0) ? 1 : 0;
     }
 
+    free(buf_x_arr);
+    free(buf_x_delta);
+    free(buf_materials);
+
     return 1;
 }
 

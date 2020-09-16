@@ -57,8 +57,8 @@ void pure_abs() {
     runningstat *s_flux_0 = malloc(sizeof *s_flux_0 * NUM_CELLS);
     runningstat *s_flux_1 = malloc(sizeof *s_flux_1 * NUM_CELLS);
     for (i = 0; i < NUM_CELLS; i++) {
-        s_flux_0[i] = init_runningstat();
-        s_flux_1[i] = init_runningstat();
+        *(s_flux_0 + i) = init_runningstat();
+        *(s_flux_1 + i) = init_runningstat();
     }
     // Structured results from map onto array
     double *m_flux_0 = malloc(sizeof *m_flux_0 * NUM_CELLS);
@@ -95,7 +95,7 @@ void pure_abs() {
 
         // Exponential solution to pure absorber problem
         for (j = 1; j < num_r_cells; j++) {
-            *(flux + j) = *(flux + j - 1) * exp(-sigma_a[*(materials + j)] * *(x_delta + j - 1));
+            *(flux + j) = *(flux + j - 1) * exp(-sigma_a[*(materials + j - 1)] * *(x_delta + j - 1));
         }
 
         // Map flux values onto parallel arrays

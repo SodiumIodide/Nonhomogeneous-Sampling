@@ -1,5 +1,5 @@
-#ifndef _GAUSSIAN_COX_GEOMETRY_GEN_H
-#define _GAUSSIAN_COX_GEOMETRY_GEN_H
+#ifndef _GAUSSIAN_COX_GEOMETRY_GEN_MONOSAMPLE_H
+#define _GAUSSIAN_COX_GEOMETRY_GEN_MONOSAMPLE_H
 
 #include <math.h>
 
@@ -7,13 +7,11 @@
 
 #define PI 4.0 * atan(1.0)
 
-int get_geometry_cox_gaussian(const gsl_rng* rng, double start_value_0, double end_value_0, double start_value_1, double end_value_1, double variance_0, double variance_1, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
+int get_geometry_cos_gaussian_monosample(const gsl_rng* rng, double start_value_0, double end_value_0, double start_value_1, double end_value_1, double variance_0, double variance_1, double end_dist, long num_divs, double** x_delta, double** x_arr, int** materials, long* num_cells) {
     // Computational values
     int material_num;
     double rand_num;
     double chord;
-    double mean;
-    double variance;
 
     // Buffer pointers for realloc
     double *buf_x_delta = NULL;
@@ -34,7 +32,7 @@ int get_geometry_cox_gaussian(const gsl_rng* rng, double start_value_0, double e
     double radius, angle;
     double mean_0 = (end_value_0 + start_value_0) / 2.0;
     double mean_1 = (end_value_1 + start_value_1) / 2.0;
-    double init_chord_0, init_chord_1;
+    double sample_chord_0, sample_chord_1;
     do {
         uniform[0] = gsl_rng_uniform_pos(rng);
         uniform[1] = gsl_rng_uniform_pos(rng);
@@ -42,44 +40,20 @@ int get_geometry_cox_gaussian(const gsl_rng* rng, double start_value_0, double e
         angle = 2.0 * PI * uniform[1];
         gaussian[0] = radius * sin(angle);
         gaussian[1] = radius * cos(angle);
-        init_chord_0 = mean_0 + sqrt(variance_0) * gaussian[0];
-        init_chord_1 = mean_1 + sqrt(variance_1) * gaussian[1];
-    } while ((init_chord_0 <= 0.0) || (init_chord_1 <= 0.0));
-    double prob_0 = init_chord_0 / (init_chord_0 + init_chord_1);
+        sample_chord_0 = mean_0 + sqrt(variance_0) * gaussian[0];
+        sample_chord_1 = mean_1 + sqrt(variance_1) * gaussian[1];
+    } while ((sample_chord_0 <= 0.0) || (sample_chord_1 <= 0.0));
+    double prob_0 = sample_chord_0 / (sample_chord_0 + sample_chord_1);
     material_num = (gsl_rng_uniform_pos(rng) < prob_0) ? 0 : 1;
 
-    int first_run = 1;
-    int resample_counter = 2;
-
     while (cons_dist < end_dist) {
-        if (resample_counter > 1) {
-            // Re-generate random numbers
-            resample_counter = 0;
-            uniform[0] = gsl_rng_uniform_pos(rng);
-            uniform[1] = gsl_rng_uniform_pos(rng);
-            radius = sqrt(-2.0 * log(uniform[0]));
-            angle = 2.0 * PI * uniform[1];
-            gaussian[0] = radius * sin(angle);
-            gaussian[1] = radius * cos(angle);
-        }
-        if (!first_run) {
-            mean = (material_num == 0) ? mean_0 : mean_1;
-            variance = (material_num == 0) ? variance_0 : variance_1;
-            chord = mean + sqrt(variance) * gaussian[resample_counter];
-            resample_counter++;
-        } else {
-            first_run = 0;
-            chord = (material_num == 0) ? init_chord_0 : init_chord_1;
-        }
-
-        if (chord <= 0.0) {
-            continue;
-        }
-
-        // Generate a new random number
+        // Generate a random number
         rand_num = gsl_rng_uniform_pos(rng);
 
-        // Calculate adn append the material length
+        // Assign a chord length based on material number
+        chord = (material_num == 0) ? sample_chord_0 : sample_chord_1;  // cm
+
+        // Calculate and append the material length
         dist = -chord * log(rand_num);  // cm
         cons_dist += dist;  // cm
 
@@ -120,7 +94,7 @@ int get_geometry_cox_gaussian(const gsl_rng* rng, double start_value_0, double e
                 *((*x_arr) + *num_cells - 1) = cons_dist - dist + (dist / (double)num_divs * (double)i);
             }
 
-            // The material present in each cell
+            // The material present ine ach cell
             if (*materials != NULL) {
                 *((*materials) + *num_cells - 1) = material_num;
             }

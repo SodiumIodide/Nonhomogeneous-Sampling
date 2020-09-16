@@ -21,7 +21,10 @@ option(PIECEWISE "Piecewise Constant Model" OFF)
 # Cox process (overrides previous selections)
 option(COX_UNIFORM "Sampling via Doubly Stochastic (Cox) Process" OFF)
 option(COX_EXPONENTIAL "Sampling via Cox Process from Exponential Distribution" OFF)
-option(COX_GAUSSIAN "Sampling via Cox Process from Gaussian Distribution" ON)
+option(COX_GAUSSIAN "Sampling via Cox Process from Gaussian Distribution" OFF)
+
+# Cox process monosample (matches LP technique of sampling)
+option(COX_MONOSAMPLE "Take one chord length sample per realization, instead of one per sublayer construction" OFF)
 
 # Constant chord length geometry generation (overrides previous selections)
 option(CONSTANT "Constant chord length" OFF)

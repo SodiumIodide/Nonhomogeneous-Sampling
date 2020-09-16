@@ -13,6 +13,7 @@
 #cmakedefine COX_UNIFORM
 #cmakedefine COX_EXPONENTIAL
 #cmakedefine COX_GAUSSIAN
+#cmakedefine COX_MONOSAMPLE
 #cmakedefine CONSTANT
 
 #ifndef _CONSTANTS_H
@@ -90,29 +91,59 @@
             } while (0)
         #else
             #ifdef COX_UNIFORM
-                #include "uniform_cox_geometry_gen.h"
-                #define GEOMETRY_GEN() do {\
-                    success = get_geometry_cox_uniform(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
-                } while (0)
-                #define OPEN_FILE() do {\
-                    fp = fopen("../csv/flux_cox_uniform.csv", "w");\
-                } while (0)
+                #ifdef COX_MONOSAMPLE
+                    #include "uniform_cox_geometry_gen_monosample.h"
+                    #define GEOMETRY_GEN() do {\
+                        success = get_geometry_cox_uniform_monosample(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                    } while (0)
+                    #define OPEN_FILE() do {\
+                        fp = fopen("../csv/flux_cox_uniform_monosample.csv", "w");\
+                    } while (0)
+                #else
+                    #include "uniform_cox_geometry_gen.h"
+                    #define GEOMETRY_GEN() do {\
+                        success = get_geometry_cox_uniform(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                    } while (0)
+                    #define OPEN_FILE() do {\
+                        fp = fopen("../csv/flux_cox_uniform.csv", "w");\
+                    } while (0)
+                #endif
             #elif defined COX_EXPONENTIAL
-                #include "exponential_cox_geometry_gen.h"
-                #define GEOMETRY_GEN() do {\
-                    success = get_geometry_cox_exponential(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
-                } while (0)
-                #define OPEN_FILE() do {\
-                    fp = fopen("../csv/flux_cox_exponential.csv", "w");\
-                } while (0)
+                #ifdef COX_MONOSAMPLE
+                    #include "exponential_cox_geometry_gen_monosample.h"
+                    #define GEOMETRY_GEN() do {\
+                        get_geometry_cox_exponential_monosample(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                    } while (0)
+                    #define OPEN_FILE() do {\
+                        fp = fopen("../csv/flux_cox_exponential_monosample.csv", "w");\
+                    } while (0)
+                #else
+                    #include "exponential_cox_geometry_gen.h"
+                    #define GEOMETRY_GEN() do {\
+                        success = get_geometry_cox_exponential(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                    } while (0)
+                    #define OPEN_FILE() do {\
+                        fp = fopen("../csv/flux_cox_exponential.csv", "w");\
+                    } while (0)
+                #endif
             #elif defined COX_GAUSSIAN
-                #include "gaussian_cox_geometry_gen.h"
-                #define GEOMETRY_GEN() do {\
-                    success = get_geometry_cox_gaussian(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], GAUSSIAN_VARIANCE[0], GAUSSIAN_VARIANCE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
-                } while (0)
-                #define OPEN_FILE() do {\
-                    fp = fopen("../csv/flux_cox_gaussian.csv", "w");\
-                } while (0)
+                #ifdef COX_MONOSAMPLE
+                    #include "gaussian_cox_geometry_gen_monosample.h"
+                    #define GEOMETRY_GEN() do {\
+                        success = get_geometry_cox_gaussian_monosample(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], GAUSSIAN_VARIANCE[0], GAUSSIAN_VARIANCE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                    } while (0)
+                    #define OPEN_FILE() do {\
+                        fp = fopen("../csv/flux_cox_gaussian_monosample.csv", "w");\
+                    } while (0)
+                #else
+                    #include "gaussian_cox_geometry_gen.h"
+                    #define GEOMETRY_GEN() do {\
+                        success = get_geometry_cox_gaussian(rng, COX_START_VALUE[0], COX_END_VALUE[0], COX_START_VALUE[1], COX_END_VALUE[1], GAUSSIAN_VARIANCE[0], GAUSSIAN_VARIANCE[1], END_DIST, NUM_DIVS, &x_delta, &x_arr, &materials, &num_r_cells);\
+                    } while (0)
+                    #define OPEN_FILE() do {\
+                        fp = fopen("../csv/flux_cox_gaussian.csv", "w");\
+                    } while (0)
+                #endif
             #else
                 #include "linear_geometry_gen.h"
                 #define GEOMETRY_GEN() do {\

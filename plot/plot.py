@@ -10,11 +10,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 XSCALE = "linear"
-YSCALE = "log"
+#YSCALE = "log"
+YSCALE = "linear"
 DATAPATH = "../csv"
 PLOTPATH = "../img"
-YMAX = 1e1
-YMIN = 1e-3
+#YMAX = 1e1
+#YMIN = 1e-3
+YMAX = 1.0
+YMIN = 0.0
 
 class data:
     def __init__(self, in_data, ylabel):
@@ -41,7 +44,7 @@ class data:
         plt.ylabel(self.ylabel)
         plt.xscale(XSCALE)
         plt.yscale(YSCALE)
-        #plt.ylim([YMIN, YMAX])
+        plt.ylim([YMIN, YMAX])
         plt.xlim([self.distance.iat[0], self.distance.iat[-1]])
         plt.grid(b=True, which='both', axis='both')
         plt.legend(loc='best')
@@ -58,7 +61,7 @@ def main():
         ylabel = "Volume Fraction"
     else:
         ylabel = "Flux"
-    r_exists = l_exists = q_r_exists = pw_exists = pw_r_exists = pw_q_exists = pw_q_r_exists = c_u_exists = c_e_exists = c_g_exists = con_exists = True
+    r_exists = l_exists = q_r_exists = pw_exists = pw_r_exists = pw_q_exists = pw_q_r_exists = c_u_exists = c_e_exists = c_g_exists = c_u_m_exists = c_e_m_exists = c_g_m_exists = con_exists = True
     try:
         r_data = pd.read_csv(f"{DATAPATH}/flux_linear_thinning.csv")
     except FileNotFoundError:
@@ -109,6 +112,21 @@ def main():
     except FileNotFoundError:
         print("Gaussian Cox not found")
         c_g_exists = False
+    try:
+        c_u_m_data = pd.read_csv(f"{DATAPATH}/flux_cox_uniform_monosample.csv")
+    except FileNotFoundError:
+        print("Uniform Cox monosample not found")
+        c_u_m_exists = False
+    try:
+        c_e_m_data = pd.read_csv(f"{DATAPATH}/flux_cox_exponential_monosample.csv")
+    except FileNotFoundError:
+        print("Exponential Cox monosample not found")
+        c_e_m_exists = False
+    try:
+        c_g_m_data = pd.read_csv(f"{DATAPATH}/flux_cox_gaussian_monosample.csv")
+    except FileNotFoundError:
+        print("Gaussian Cox monosample not found")
+        c_g_m_exists = False
     try:
         con_data = pd.read_csv(f"{DATAPATH}/flux_constant.csv")
     except FileNotFoundError:
@@ -174,6 +192,24 @@ def main():
             c_g_obj.plot("Gaussian Cox Flux", "cox_gaussian")
         else:
             c_g_obj.plot("Gaussian Cox Volume Fraction", "vf_cox_gaussian")
+    if c_u_m_exists:
+        c_u_m_obj = data(c_u_m_data, ylabel)
+        if flux:
+            c_u_m_obj.plot("Uniform Cox Monosample Flux", "cox_uniform_monosample")
+        else:
+            c_u_m_obj.plot("Uniform Cox Monosample Volume Fraction", "vf_cox_uniform_monosample")
+    if c_e_m_exists:
+        c_e_m_obj = data(c_e_m_data, ylabel)
+        if flux:
+            c_e_m_obj.plot("Exponential Cox Monosample Flux", "cox_exponential_monosample")
+        else:
+            c_e_m_obj.plot("Exponential Cox Volume Fraction", "vf_cox_exponential_monosample")
+    if c_g_m_exists:
+        c_g_m_obj = data(c_g_m_data, ylabel)
+        if flux:
+            c_g_m_obj.plot("Gaussian Cox Monosample Flux", "cox_gaussian_monosample")
+        else:
+            c_g_m_obj.plot("Gaussian Cox Volume Fraction", "vf_cox_gaussian_monosample")
     if con_exists:
         con_obj = data(con_data, ylabel)
         if flux:

@@ -74,7 +74,7 @@ void material_calc(double** unstructured, double **unstruct_delta, int** materia
                 weight_tally += delta * *((*unstructured) + counter) * m_switch;  // unit-cm
             }  // Unstructured loop
 
-            // Average the results, or just append if no results previously
+            // Average the results to running statistics
             if (k == 0) {
                 *((*material_struct_0) + i) += (weight_tally / struct_delta);  // unit
             } else {
