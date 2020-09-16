@@ -54,6 +54,8 @@ Additional parameters:
     - Same as above, but chord lengths are sampled from an Exponential distribution, before sampling the Markovian material sublayers.
 - **COX_GAUSSIAN**
     - Same as above, but chord lengths are sampled from a Gaussian or Normal distribution, before sampling the Markovian material sublayers.
+- **COX_MONOSAMPLE**
+    - Default double-stochastic Cox geometry generation will involve a chord length re-sampling at each sublayer construction. This option sets a chord length re-sampling to occur only once per realization generation, in line with the necessary LP methodology.
 - **CONSTANT**
     - Overrides other options. This setting will use constant chord lengths to generate the geometry, equal to the starting chord lengths of each material. That is, the end chord lengths are not used.
 
