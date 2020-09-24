@@ -26,17 +26,11 @@
     free(x_arr);\
     free(materials);\
     free(flux);\
-    free(s_flux_0);\
-    free(s_flux_1);\
     free(m_flux_0);\
     free(m_flux_1);\
-    gsl_rng_free(rng);\
 } while (0)
 
-void pure_abs() {
-    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
-    // Seed generator
-    gsl_rng_set(rng, SEED);
+void pure_abs(const gsl_rng* rng, runningstat** s_flux_0, runningstat** s_flux_1) {
     // Material absorption cross-sections
     double sigma_a[2] = {
         (1.0 - SCAT_COEFF[0]) * SIGMA_T[0],
@@ -53,13 +47,6 @@ void pure_abs() {
     double delta_x = END_DIST / (double)NUM_CELLS;
     // Solution variables
     double *flux = malloc(sizeof *flux * NUM_DIVS);
-    // Statistics variables - structured
-    runningstat *s_flux_0 = malloc(sizeof *s_flux_0 * NUM_CELLS);
-    runningstat *s_flux_1 = malloc(sizeof *s_flux_1 * NUM_CELLS);
-    for (i = 0; i < NUM_CELLS; i++) {
-        *(s_flux_0 + i) = init_runningstat();
-        *(s_flux_1 + i) = init_runningstat();
-    }
     // Structured results from map onto array
     double *m_flux_0 = malloc(sizeof *m_flux_0 * NUM_CELLS);
     double *m_flux_1 = malloc(sizeof *m_flux_1 * NUM_CELLS);
@@ -67,11 +54,6 @@ void pure_abs() {
     double *buf_flux = NULL;
     // Generic return
     int success = 0;
-
-    // File handle
-    FILE *fp;
-    // Distance counter
-    double distance = 0.0;
 
     for (i = 0; i < NUM_REALIZATIONS; i++) {
         // Fill Markovian geometry
@@ -104,10 +86,10 @@ void pure_abs() {
         // Statistically track flux values
         for (j = 0; j < NUM_CELLS; j++) {
             if (*(m_flux_0 + j) != 0.0) {
-                push(&*(s_flux_0 + j), *(m_flux_0 + j));
+                push(&*((*s_flux_0) + j), *(m_flux_0 + j));
             }
             if (*(m_flux_1 + j) != 0.0) {
-                push(&*(s_flux_1 + j), *(m_flux_1 + j));
+                push(&*((*s_flux_1) + j), *(m_flux_1 + j));
             }
         }
 
@@ -116,20 +98,6 @@ void pure_abs() {
             fflush(stdout);
         }
     }
-    printf("\n");
-
-    // Save flux data
-    OPEN_FILE();
-    fprintf(fp, "distance,flux0,varflux0,flux1,varflux1\n");
-    for (i = 0; i < NUM_CELLS; i++) {
-        distance += delta_x;
-        fprintf(fp, "%f,%f,%f,%f,%f\n", distance - delta_x / 2.0, mean(&*(s_flux_0 + i)), variance(&*(s_flux_0 + i)), mean(&*(s_flux_1 + i)), variance(&*(s_flux_1 + i)));
-    }
-
-    printf("Calculation done\n");
-
-    // Cleanup
-    fclose(fp);
     CLEANUP();
 }
 

@@ -66,7 +66,9 @@ const double FLUX_INIT = 1.0;
 const long int NUM_TIME = 1e5L;
 #endif
 // Number of realizations
-const long int NUM_REALIZATIONS = (long int)1e7L;
+const long int NUM_REALIZATIONS = (long int)1e3L;
+// Number of realizations for inner convergence during the Cox process
+const long int NUM_COX_REALIZATIONS_INNER = (long int)1e3L;
 // Number of realizations (geometry timing)
 const long int NUM_TIME = (long int)1e7L;
 // Number to display progress

@@ -19,12 +19,14 @@ option(QUADRATIC "Quadratic Model" OFF)
 option(PIECEWISE "Piecewise Constant Model" OFF)
 
 # Cox process (overrides previous selections)
-option(COX_UNIFORM "Sampling via Doubly Stochastic (Cox) Process" OFF)
+option(COX_UNIFORM "Sampling via Doubly Stochastic (Cox) Process" ON)
 option(COX_EXPONENTIAL "Sampling via Cox Process from Exponential Distribution" OFF)
 option(COX_GAUSSIAN "Sampling via Cox Process from Gaussian Distribution" OFF)
 
-# Cox process monosample (matches LP technique of sampling)
+# Cox process monosample
 option(COX_MONOSAMPLE "Take one chord length sample per realization, instead of one per sublayer construction" OFF)
+# Cox process analoguous to LP solution methodology
+option(COX_FULLCONVERGE "Cox Monosample, but utilizing the same chord length samples for many inner realizations to obtain a convergence similar to LP" OFF)
 
 # Constant chord length geometry generation (overrides previous selections)
 option(CONSTANT "Constant chord length" OFF)
@@ -34,6 +36,9 @@ option(S2 "Numerical Two-Ordinate SN Transport Method" OFF)
 option(GEOMETRYTIME "Count CPU clock cycles required for certain number of geometry generations" OFF)
 option(ANALYTICAL "One-dimensional analytical solution to transport equation - Requires BLAS/LAPACK" ON)
 option(VOLFRAC "Set importance to one to compute volume fractions of generated materials" OFF)
+
+# Debug/analytical data - first realization profile
+option(ONE_REALIZATION_PROFILE "Save the first realization output" OFF)
 #########################################
 #########################################
 #########################################
@@ -88,6 +93,13 @@ endif()
 # Quadratic sampling is only via the thinning method
 if(QUADRATIC AND NOT PIECEWISE)
     set(REJECTION OFF)
+endif()
+
+if (COX_FULL_CONVERGE)
+    if (NOT COX_UNIFORM AND NOT COX_EXPONENTIAL AND NOT COX_GAUSSIAN)
+        set(COX_UNIFORM ON)
+    endif()
+    set(COX_MONOSAMPLE OFF)
 endif()
 
 if(COX_UNIFORM OR COX_EXPONENTIAL OR COX_GAUSSIAN)

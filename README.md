@@ -55,7 +55,9 @@ Additional parameters:
 - **COX_GAUSSIAN**
     - Same as above, but chord lengths are sampled from a Gaussian or Normal distribution, before sampling the Markovian material sublayers.
 - **COX_MONOSAMPLE**
-    - Default double-stochastic Cox geometry generation will involve a chord length re-sampling at each sublayer construction. This option sets a chord length re-sampling to occur only once per realization generation, in line with the necessary LP methodology.
+    - Default double-stochastic Cox geometry generation will involve a chord length re-sampling at each sublayer construction. This option sets a chord length re-sampling to occur only once per realization generation.
+- **COX_FULLCONVERGE**
+    - Similar to the above monosample option, but many realizations are performed for each sampled mean chord length, resulting in a profile analogous to the LP solution methodology.
 - **CONSTANT**
     - Overrides other options. This setting will use constant chord lengths to generate the geometry, equal to the starting chord lengths of each material. That is, the end chord lengths are not used.
 
@@ -82,6 +84,7 @@ Other useful parameters to change are included in this file. Comments are presen
 | `FLUX_INIT` | Pure absorber solution only - scalar flux boundary condition at the left-hand side of the problem, exponentially attenuated through material regions |
 | `NUM_TIME` | Geometry timing solution only - number of geometries to generate when tallying CPU cycles consumed |
 | `NUM_REALIZATIONS` | Total number of realizations to create while averaging scalar flux data |
+| `NUM_COX_REALIZATIONS_INNER` | Used for the full-converge Cox option, this is the number of inner realizations to perform using a single individual sample of the material chord lengths |
 | `NUM_TIME` | Total number of realizations to create when performing the geometry time calculation, which is considerably faster than a transport solution |
 | `NUM_SAY` | When running in terminal, a progress message is displayed for every `NUM_SAY` completed realizations |
 | `TOLERANCE` | The relative error tolerance for convergence testing when using diamond differencing in the SN solution |

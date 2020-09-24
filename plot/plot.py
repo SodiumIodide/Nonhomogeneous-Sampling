@@ -10,14 +10,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 XSCALE = "linear"
-#YSCALE = "log"
-YSCALE = "linear"
+YSCALE = "log"
+#YSCALE = "linear"
 DATAPATH = "../csv"
 PLOTPATH = "../img"
-#YMAX = 1e1
-#YMIN = 1e-3
-YMAX = 1.0
-YMIN = 0.0
+YMAX = 1e1
+YMIN = 1e-3
+#YMAX = 1.0
+#YMIN = 0.0
 
 class data:
     def __init__(self, in_data, ylabel):

@@ -32,10 +32,7 @@
     free(materials);\
     free(phi_mat_0);\
     free(phi_mat_1);\
-    free(phi_mat_stat_0);\
-    free(phi_mat_stat_1);\
     free(cell_vector);\
-    gsl_rng_free(rng);\
 } while (0)
 
 #define CLEANUP_LOOP() do{\
@@ -48,10 +45,7 @@
 void dgesv_(int *n, int *nrhs, double *a,
            int *lda, int *ipiv, double *b, int *ldb, int *info);
 
-void analytical() {
-    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
-    // Seed generator
-    gsl_rng_set(rng, SEED);
+void analytical(const gsl_rng* rng, runningstat** phi_mat_stat_0, runningstat** phi_mat_stat_1) {
     // Iterators
     long int c, i;
     // Material absorption cross-sections
@@ -71,20 +65,11 @@ void analytical() {
     int *materials = malloc(sizeof *materials * NUM_DIVS);
     long num_r_cells = 0;
     double delta_x = END_DIST / (double)NUM_CELLS;
-    // Solution variables
-    // Statistics flux variables - structured
-    runningstat *phi_mat_stat_0 = malloc(sizeof *phi_mat_stat_0 * NUM_CELLS);
-    runningstat *phi_mat_stat_1 = malloc(sizeof *phi_mat_stat_1 * NUM_CELLS);
     // Structured flux results from map onto array
     double *phi_mat_0 = malloc(sizeof *phi_mat_0 * NUM_CELLS);
     double *phi_mat_1 = malloc(sizeof *phi_mat_1 * NUM_CELLS);
     // Generic return
     int success = 0;
-
-    // File handle
-    FILE *fp;
-    // Distance counter
-    double distance = 0.0;
 
     // X values of flux for plotting
     double *cell_vector = malloc(sizeof *cell_vector * NUM_CELLS);
@@ -100,8 +85,6 @@ void analytical() {
     for (c = 0; c < NUM_CELLS; c++) {
         *(phi_mat_0 + c) = 0.0;
         *(phi_mat_1 + c) = 0.0;
-        *(phi_mat_stat_0 + c) = init_runningstat();
-        *(phi_mat_stat_1 + c) = init_runningstat();
     }
 
     // Calculation: iterations
@@ -230,10 +213,10 @@ void analytical() {
 
             for (c = 0; c < NUM_CELLS; c++) {
                 if (*(phi_mat_0 + c) != 0.0) {
-                    push(&*(phi_mat_stat_0 + c), *(phi_mat_0 + c));
+                    push(&*((*phi_mat_stat_0) + c), *(phi_mat_0 + c));
                 }
                 if (*(phi_mat_1 + c) != 0.0) {
-                    push(&*(phi_mat_stat_1 + c), *(phi_mat_1 + c));
+                    push(&*((*phi_mat_stat_1) + c), *(phi_mat_1 + c));
                 }
             }  // Cell loop
 
@@ -242,7 +225,9 @@ void analytical() {
                 fflush(stdout);
             }
 
+#ifdef ONE_REALIZATION_PROFILE
             // Produce a one-realization profile
+            FILE *fp;
             if (iterations_outer == 1) {
                 fp = fopen("../csv/one_realization.csv", "w");
                 fprintf(fp, "distance,flux\n");
@@ -253,6 +238,7 @@ void analytical() {
                 fclose(fp);
                 printf("First realization data written\n");
             }
+#endif
         }
 
         if (iterations_outer > NUM_REALIZATIONS) {
@@ -262,21 +248,6 @@ void analytical() {
         // Cleanup
         CLEANUP_LOOP();
     }  // Outer loop
-    printf("\n");
-
-    // Save flux data
-    OPEN_FILE();
-    fprintf(fp, "distance,flux0,varflux0,flux1,varflux1\n");
-    distance = 0.0;
-    for (c = 0; c < NUM_CELLS; c++) {
-        distance += delta_x;
-        fprintf(fp, "%f,%f,%f,%f,%f\n", distance - delta_x / 2.0, mean(&*(phi_mat_stat_0 + c)), variance(&*(phi_mat_stat_0 + c)), mean(&*(phi_mat_stat_1 + c)), variance(&*(phi_mat_stat_1 + c)));
-    }
-
-    printf("Calculation done\n");
-
-    // Cleanup
-    fclose(fp);
     CLEANUP();
 }
 

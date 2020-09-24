@@ -26,17 +26,11 @@
     free(x_arr);\
     free(materials);\
     free(unity);\
-    free(s_vfrac_0);\
-    free(s_vfrac_1);\
     free(m_vfrac_0);\
     free(m_vfrac_1);\
-    gsl_rng_free(rng);\
 } while (0)
 
-void volume_fraction() {
-    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
-    // Seed generator
-    gsl_rng_set(rng, SEED);
+void volume_fraction(const gsl_rng* rng, runningstat** s_vfrac_0, runningstat** s_vfrac_1) {
     // Iterators
     long int i, c;
     // Geometry variables
@@ -50,23 +44,11 @@ void volume_fraction() {
     double delta_x = END_DIST / (double)NUM_CELLS;
     // Solution variables
     double *unity = malloc(sizeof *unity * NUM_DIVS);
-    // Statistics variables - structured
-    runningstat *s_vfrac_0 = malloc(sizeof *s_vfrac_0 * NUM_CELLS);
-    runningstat *s_vfrac_1 = malloc(sizeof *s_vfrac_1 * NUM_CELLS);
-    for (i = 0; i < NUM_CELLS; i++) {
-        s_vfrac_0[i] = init_runningstat();
-        s_vfrac_1[i] = init_runningstat();
-    }
     // Structured results from map onto array
     double *m_vfrac_0 = malloc(sizeof *m_vfrac_0 * NUM_CELLS);
     double *m_vfrac_1 = malloc(sizeof *m_vfrac_1 * NUM_CELLS);
     // Buffer variable for reallocation
     double *buf_unity = NULL;
-
-    // File handle
-    FILE *fp;
-    // Distance counter
-    double distance = 0.0;
 
     for (i = 0; i < NUM_REALIZATIONS; i++) {
         // Fill Markovian geometry
@@ -96,8 +78,8 @@ void volume_fraction() {
 
         // Statistically track volume fraction values
         for (c = 0; c < NUM_CELLS; c++) {
-            push(&*(s_vfrac_0 + c), *(m_vfrac_0 + c));
-            push(&*(s_vfrac_1 + c), *(m_vfrac_1 + c));
+            push(&*((*s_vfrac_0) + c), *(m_vfrac_0 + c));
+            push(&*((*s_vfrac_1) + c), *(m_vfrac_1 + c));
         }
 
         if ((i + 1) % NUM_SAY == 0) {
@@ -105,20 +87,6 @@ void volume_fraction() {
             fflush(stdout);
         }
     }
-    printf("\n");
-
-    // Save flux data - note that this is actually volume fractions due to calculational differences
-    OPEN_FILE();
-    fprintf(fp, "distance,flux0,varflux0,flux1,varflux1\n");
-    for (c = 0; c < NUM_CELLS; c++) {
-        distance += delta_x;
-        fprintf(fp, "%f,%f,%f,%f,%f\n", distance - delta_x / 2.0, mean(&*(s_vfrac_0 + c)), variance(&*(s_vfrac_0 + c)), mean(&*(s_vfrac_1 + c)), variance(&*(s_vfrac_1 + c)));
-    }
-
-    printf("Calculation done\n");
-
-    // Cleanup
-    fclose(fp);
     CLEANUP();
 }
 

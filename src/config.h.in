@@ -14,7 +14,9 @@
 #cmakedefine COX_EXPONENTIAL
 #cmakedefine COX_GAUSSIAN
 #cmakedefine COX_MONOSAMPLE
+#cmakedefine COX_FULLCONVERGE
 #cmakedefine CONSTANT
+#cmakedefine ONE_REALIZATION_PROFILE
 
 #ifndef _CONSTANTS_H
 #include "constants.h"
@@ -155,6 +157,10 @@
             #endif
         #endif
     #endif
+#endif
+
+#ifdef COX_FULL_CONVERGE
+    #include "cox_full_converge.h"
 #endif
 
 #endif

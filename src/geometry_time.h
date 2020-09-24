@@ -20,7 +20,6 @@
     free(x_delta);\
     free(x_arr);\
     free(materials);\
-    gsl_rng_free(rng);\
 } while (0)
 
 static inline unsigned long rdtsc() {
@@ -41,10 +40,7 @@ static inline unsigned long rdtsc() {
 #endif
 }
 
-void geometry_time() {
-    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
-    // Seed generator
-    gsl_rng_set(rng, SEED);
+void geometry_time(const gsl_rng* rng) {
     // Initially allocate to 1-length
     double *x_delta = malloc(sizeof *x_delta * NUM_DIVS);
     double *x_arr = malloc(sizeof *x_arr * NUM_DIVS);

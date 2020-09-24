@@ -31,13 +31,10 @@
     free(materials);\
     free(phi_mat_0);\
     free(phi_mat_1);\
-    free(phi_mat_stat_0);\
-    free(phi_mat_stat_1);\
     free(mu);\
     free(weights);\
     free(psi_bound_l);\
     free(psi_bound_r);\
-    gsl_rng_free(rng);\
 } while (0)
 
 #define CLEANUP_LOOP() do{\
@@ -70,10 +67,7 @@ double max_relative_error(double *arr_a, double *arr_b) {
     return value;
 }
 
-void s2() {
-    gsl_rng* rng = gsl_rng_alloc(gsl_rng_mt19937);
-    // Seed generator
-    gsl_rng_set(rng, SEED);
+void s2(const gsl_rng* rng, runningstat** phi_mat_stat_0, runningstat** phi_mat_stat_1) {
     // Iterators
     long int c, m;
     long int num_iter_inner = (long int)1e5;
@@ -89,20 +83,11 @@ void s2() {
     int *materials = malloc(sizeof *materials * NUM_DIVS);
     long num_r_cells = 0;
     double delta_x = END_DIST / (double)NUM_CELLS;
-    // Solution variables
-    // Statistics flux variables - structured
-    runningstat *phi_mat_stat_0 = malloc(sizeof *phi_mat_stat_0 * NUM_CELLS);
-    runningstat *phi_mat_stat_1 = malloc(sizeof *phi_mat_stat_1 * NUM_CELLS);
     // Structured flux results from map onto array
     double *phi_mat_0 = malloc(sizeof *phi_mat_0 * NUM_CELLS);
     double *phi_mat_1 = malloc(sizeof *phi_mat_1 * NUM_CELLS);
     // Generic return
     int success = 0;
-
-    // File handle
-    FILE *fp;
-    // Distance counter
-    double distance = 0.0;
 
     // Ordinates and weights
     double *mu = malloc(sizeof *mu * NUM_ORDS);
@@ -131,8 +116,6 @@ void s2() {
     for (c = 0; c < NUM_CELLS; c++) {
         *(phi_mat_0 + c) = 0.0;
         *(phi_mat_1 + c) = 0.0;
-        *(phi_mat_stat_0 + c) = init_runningstat();
-        *(phi_mat_stat_1 + c) = init_runningstat();
     }
 
     // Legendre Gauss Quadrature over chosen ordinates
@@ -278,10 +261,10 @@ void s2() {
 
             for (c = 0; c < NUM_CELLS; c++) {
                 if (*(phi_mat_0 + c) != 0.0) {
-                    push(&*(phi_mat_stat_0 + c), *(phi_mat_0 + c));
+                    push(&*((*phi_mat_stat_0) + c), *(phi_mat_0 + c));
                 }
                 if (*(phi_mat_1 + c) != 0.0) {
-                    push(&*(phi_mat_stat_1 + c), *(phi_mat_1 + c));
+                    push(&*((*phi_mat_stat_1) + c), *(phi_mat_1 + c));
                 }
             } // Cell loop
 
@@ -296,20 +279,6 @@ void s2() {
         // Cleanup
         CLEANUP_LOOP();
     }  // Outer loop
-    printf("\n");
-
-    // Save flux data
-    OPEN_FILE();
-    fprintf(fp, "distance,flux0,varflux0,flux1,varflux1\n");
-    for (c = 0; c < NUM_CELLS; c++) {
-        distance += delta_x;
-        fprintf(fp, "%f,%f,%f,%f,%f\n", distance - delta_x / 2.0, mean(&*(phi_mat_stat_0 + c)), variance(&*(phi_mat_stat_0 + c)), mean(&*(phi_mat_stat_1 + c)), variance(&*(phi_mat_stat_1 + c)));
-    }
-
-    printf("Calculation done\n");
-
-    // Cleanup
-    fclose(fp);
     CLEANUP();
 }
 
