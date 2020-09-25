@@ -10,55 +10,48 @@
 #include "constants.h"
 #endif
 
-#ifdef S2
+#ifdef COX_FULL_CONVERGE
+    #ifndef _COX_FULL_CONVERGE_H
+        #include "cox_full_converge.h"
+        #define SOLVE() do {\
+            cox_full_converge(rng, &phi_mat_stat_0, &phi_mat_stat_1);
+        }
+    #endif
+#elif defined S2
     #ifndef _S2_H
         #include "s2.h"
     #endif
     #define SOLVE() do {\
-        s2(rng, &phi_mat_stat_0, &phi_mat_stat_1);\
+        s2(rng, &phi_mat_stat_0, &phi_mat_stat_1, 0.0, 0.0);\
     } while (0)
-#endif
-
-#ifdef PUREABS
+#elif defined PUREABS
     #ifndef _PURE_ABS_H
         #include "pure_abs.h"
     #endif
     #define SOLVE() do {\
-        pure_abs(rng, &phi_mat_stat_0, &phi_mat_stat_1);\
+        pure_abs(rng, &phi_mat_stat_0, &phi_mat_stat_1, 0.0, 0.0);\
     } while (0)
-#endif
-
-#ifdef GEOMETRYTIME
+#elif defined GEOMETRYTIME
     #ifndef _GEOMETRY_TIME_H
         #include "geometry_time.h"
     #endif
     #define SOLVE() do {\
         geometry_time(rng);\
     } while (0)
-#endif
-
-#ifdef ANALYTICAL
+#elif defined ANALYTICAL
     #ifndef _ANALYTICAL_H
         #include "analytical.h"
     #endif
     #define SOLVE() do {\
-        analytical(rng, &phi_mat_stat_0, &phi_mat_stat_1);\
+        analytical(rng, &phi_mat_stat_0, &phi_mat_stat_1, 0.0, 0.0);\
     } while (0)
-#endif
-
-#ifdef VOLFRAC
+#elif defined VOLFRAC
     #ifndef _VOLUME_FRACTION_H
         #include "volume_fraction.h"
     #endif
     #define SOLVE() do {\
-        volume_fraction(rng, &phi_mat_stat_0, &phi_mat_stat_1);\
+        volume_fraction(rng, &phi_mat_stat_0, &phi_mat_stat_1, 0.0, 0.0);\
     } while (0)
-#endif
-
-#ifdef COX_FULL_CONVERGE
-    #ifndef _COX_FULL_CONVERGE_H
-        #include "cox_full_converge.h"
-    #endif
 #endif
 
 #include <gsl/gsl_rng.h>
@@ -87,11 +80,7 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-#ifndef COX_FULL_CONVERGE
     SOLVE();
-#else
-    cox_full_converge(rng, &phi_mat_stat_0, &phi_mat_stat_1);
-#endif
 
 #ifndef GEOMETRY_TIME
     printf("\nCalculation done\n");

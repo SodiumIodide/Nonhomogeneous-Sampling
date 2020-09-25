@@ -67,7 +67,12 @@ double max_relative_error(double *arr_a, double *arr_b) {
     return value;
 }
 
-void s2(const gsl_rng* rng, runningstat** phi_mat_stat_0, runningstat** phi_mat_stat_1) {
+void s2(const gsl_rng* rng, runningstat** phi_mat_stat_0, runningstat** phi_mat_stat_1, double chord_0, double chord_1) {
+    if (chord_0 == 0.0 && chord_1 == 0.0) {
+        (void)chord_0;
+        (void)chord_1;
+    }
+
     // Iterators
     long int c, m;
     long int num_iter_inner = (long int)1e5;

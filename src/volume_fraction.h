@@ -30,7 +30,12 @@
     free(m_vfrac_1);\
 } while (0)
 
-void volume_fraction(const gsl_rng* rng, runningstat** s_vfrac_0, runningstat** s_vfrac_1) {
+void volume_fraction(const gsl_rng* rng, runningstat** s_vfrac_0, runningstat** s_vfrac_1, double chord_0, double chord_1) {
+    if (chord_0 == 0.0 && chord_1 == 0.0) {
+        (void)chord_0;
+        (void)chord_1;
+    }
+
     // Iterators
     long int i, c;
     // Geometry variables

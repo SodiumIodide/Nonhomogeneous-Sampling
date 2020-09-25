@@ -30,7 +30,12 @@
     free(m_flux_1);\
 } while (0)
 
-void pure_abs(const gsl_rng* rng, runningstat** s_flux_0, runningstat** s_flux_1) {
+void pure_abs(const gsl_rng* rng, runningstat** s_flux_0, runningstat** s_flux_1, double chord_0, double chord_1) {
+    if (chord_0 == 0.0 && chord_1 == 0.0) {
+        (void)chord_0;
+        (void)chord_1;
+    }
+
     // Material absorption cross-sections
     double sigma_a[2] = {
         (1.0 - SCAT_COEFF[0]) * SIGMA_T[0],

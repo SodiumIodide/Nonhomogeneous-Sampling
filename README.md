@@ -84,7 +84,7 @@ Other useful parameters to change are included in this file. Comments are presen
 | `FLUX_INIT` | Pure absorber solution only - scalar flux boundary condition at the left-hand side of the problem, exponentially attenuated through material regions |
 | `NUM_TIME` | Geometry timing solution only - number of geometries to generate when tallying CPU cycles consumed |
 | `NUM_REALIZATIONS` | Total number of realizations to create while averaging scalar flux data |
-| `NUM_COX_REALIZATIONS_INNER` | Used for the full-converge Cox option, this is the number of inner realizations to perform using a single individual sample of the material chord lengths |
+| `NUM_COX_REALIZATIONS_OUTER` | Used for the full-converge Cox option, this is the number of outer to perform, where each is using a single individual sample of the material chord lengths for an inner number of realizations equivalent to `NUM_REALIZATIONS` |
 | `NUM_TIME` | Total number of realizations to create when performing the geometry time calculation, which is considerably faster than a transport solution |
 | `NUM_SAY` | When running in terminal, a progress message is displayed for every `NUM_SAY` completed realizations |
 | `TOLERANCE` | The relative error tolerance for convergence testing when using diamond differencing in the SN solution |

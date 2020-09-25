@@ -45,7 +45,12 @@
 void dgesv_(int *n, int *nrhs, double *a,
            int *lda, int *ipiv, double *b, int *ldb, int *info);
 
-void analytical(const gsl_rng* rng, runningstat** phi_mat_stat_0, runningstat** phi_mat_stat_1) {
+void analytical(const gsl_rng* rng, runningstat** phi_mat_stat_0, runningstat** phi_mat_stat_1, double chord_0, double chord_1) {
+    if (chord_0 == 0.0 && chord_1 == 0.0) {
+        (void)chord_0;
+        (void)chord_1;
+    }
+
     // Iterators
     long int c, i;
     // Material absorption cross-sections

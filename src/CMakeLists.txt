@@ -100,6 +100,8 @@ if (COX_FULL_CONVERGE)
         set(COX_UNIFORM ON)
     endif()
     set(COX_MONOSAMPLE OFF)
+    # This option is incompatible with geometrytime, use a setting without outer looping
+    set(GEOMETRYTIME OFF)
 endif()
 
 if(COX_UNIFORM OR COX_EXPONENTIAL OR COX_GAUSSIAN)
