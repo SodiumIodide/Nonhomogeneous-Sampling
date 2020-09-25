@@ -14,8 +14,8 @@
     #ifndef _COX_FULL_CONVERGE_H
         #include "cox_full_converge.h"
         #define SOLVE() do {\
-            cox_full_converge(rng, &phi_mat_stat_0, &phi_mat_stat_1);
-        }
+            cox_full_converge(rng, &phi_mat_stat_0, &phi_mat_stat_1);\
+        } while (0)
     #endif
 #elif defined S2
     #ifndef _S2_H

@@ -72,7 +72,7 @@
 
 #define PI 4.0 * atan(1.0)
 
-#define CLEANUP() do {\
+#define CLEANUP_COX() do {\
     free(inner_phi_mat_stat_0);\
     free(inner_phi_mat_stat_1);\
 } while (0)
@@ -150,12 +150,16 @@ void cox_full_converge(const gsl_rng* rng, runningstat** overall_flux_0, running
 
         iterations_counter++;
 
-        if (iterations_counter % NUM_SAY == 0) {
-            printf("Overall Iteration Number: %ld / %ld\n", iterations_counter, NUM_COX_REALIZATIONS_OUTER);
+        if (iterations_counter % NUM_SAY_COX_FULL_CONVERGE == 0) {
+            printf("\nOverall Iteration Number: %ld / %ld\n", iterations_counter, NUM_COX_REALIZATIONS_OUTER);
+        }
+
+        if (iterations_counter > NUM_COX_REALIZATIONS_OUTER) {
+            cont_calc_outer = 0;
         }
     }
 
-    CLEANUP();
+    CLEANUP_COX();
 }
 
 #endif

@@ -26,7 +26,7 @@ option(COX_GAUSSIAN "Sampling via Cox Process from Gaussian Distribution" OFF)
 # Cox process monosample
 option(COX_MONOSAMPLE "Take one chord length sample per realization, instead of one per sublayer construction" OFF)
 # Cox process analoguous to LP solution methodology
-option(COX_FULLCONVERGE "Cox Monosample, but utilizing the same chord length samples for many inner realizations to obtain a convergence similar to LP" OFF)
+option(COX_FULL_CONVERGE "Cox Monosample, but utilizing the same chord length samples for many inner realizations to obtain a convergence similar to LP" OFF)
 
 # Constant chord length geometry generation (overrides previous selections)
 option(CONSTANT "Constant chord length" OFF)

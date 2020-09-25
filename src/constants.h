@@ -74,6 +74,7 @@ const long int NUM_TIME = (long int)1e7L;
 // Number to display progress
 const long int NUM_SAY = (long int)1e3L;
 // Tolerance
+const long int NUM_SAY_COX_FULL_CONVERGE = (long int)1e1L;
 const double TOLERANCE = 1e-6;
 
 #endif

@@ -56,7 +56,7 @@ Additional parameters:
     - Same as above, but chord lengths are sampled from a Gaussian or Normal distribution, before sampling the Markovian material sublayers.
 - **COX_MONOSAMPLE**
     - Default double-stochastic Cox geometry generation will involve a chord length re-sampling at each sublayer construction. This option sets a chord length re-sampling to occur only once per realization generation.
-- **COX_FULLCONVERGE**
+- **COX_FULL_CONVERGE**
     - Similar to the above monosample option, but many realizations are performed for each sampled mean chord length, resulting in a profile analogous to the LP solution methodology.
 - **CONSTANT**
     - Overrides other options. This setting will use constant chord lengths to generate the geometry, equal to the starting chord lengths of each material. That is, the end chord lengths are not used.
@@ -87,6 +87,7 @@ Other useful parameters to change are included in this file. Comments are presen
 | `NUM_COX_REALIZATIONS_OUTER` | Used for the full-converge Cox option, this is the number of outer to perform, where each is using a single individual sample of the material chord lengths for an inner number of realizations equivalent to `NUM_REALIZATIONS` |
 | `NUM_TIME` | Total number of realizations to create when performing the geometry time calculation, which is considerably faster than a transport solution |
 | `NUM_SAY` | When running in terminal, a progress message is displayed for every `NUM_SAY` completed realizations |
+| `NUM_SAY_COX_FULL_CONVERGE` | When running in terminal, a progress message for the `COX_FULL_CONVERGE` option is displayed every `NUM_SAY_COX_FULL_CONVERGE` iterations of individual chord length samples |
 | `TOLERANCE` | The relative error tolerance for convergence testing when using diamond differencing in the SN solution |
 
 ## Note on Quadratic Chord Length Variation

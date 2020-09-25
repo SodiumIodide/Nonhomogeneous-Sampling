@@ -14,7 +14,7 @@
 #cmakedefine COX_EXPONENTIAL
 #cmakedefine COX_GAUSSIAN
 #cmakedefine COX_MONOSAMPLE
-#cmakedefine COX_FULLCONVERGE
+#cmakedefine COX_FULL_CONVERGE
 #cmakedefine CONSTANT
 #cmakedefine ONE_REALIZATION_PROFILE
 
